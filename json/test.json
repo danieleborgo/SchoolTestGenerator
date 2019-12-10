@@ -1,0 +1,62 @@
+{
+    "subject": "Subject",
+    "subtitle": "Test argument",
+    "language": "Italian",
+    "class": "class",
+    "date": "13/12/2019",
+    "duration": 70,
+    "test":[
+        {
+            "argument": "Argument 1",
+            "questions": [
+                {
+                    "type": "no_space_question",
+                    "text": "Question 1"
+                },
+                {
+                    "type": "no_space_question",
+                    "text": "Question 2"
+                },
+                {
+                    "type": "no_space_question",
+                    "text": "Question 3",
+                    "points": 2
+                }
+            ]
+        },
+        {
+            "argument": "Argument 2",
+            "questions": [
+                {
+                    "type": "no_space_question",
+                    "text": "Question 4"
+                },
+                {
+                    "type": "no_space_question",
+                    "text": "Question 5"
+                },
+                {
+                    "type": "no_space_question",
+                    "text": "Question 6"
+                }
+            ]
+        },
+        {
+              "argument": "Argument 3",
+              "questions": [
+                  {
+                      "type": "no_space_question",
+                      "text": "Question 7"
+                  },
+                  {
+                      "type": "no_space_question",
+                      "text": "Question 8"
+                  },
+                  {
+                      "type": "no_space_question",
+                      "text": "Question 9"
+                  }
+              ]
+          }
+    ]
+}

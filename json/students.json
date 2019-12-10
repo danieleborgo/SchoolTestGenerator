@@ -1,0 +1,19 @@
+[
+  {
+    "name": "name1",
+    "surname": "surname1"
+  },
+  {
+    "name": "name2",
+    "surname": "surname2",
+    "type": "more_time"
+  },
+  {
+    "name": "name3",
+    "surname": "surname3"
+  },
+  {
+    "name": "name4",
+    "surname": "surname4"
+  }
+]
