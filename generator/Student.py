@@ -30,7 +30,7 @@ def translate_students(students_json):
             student_type = TYPE.translate_type(students_json[i]['type'])
 
         students.append(
-            Student(i, students_json[i]['name'], students_json[i]['surname'], student_type)
+            Student(i+1, students_json[i]['name'], students_json[i]['surname'], student_type)
         )
 
     return students
