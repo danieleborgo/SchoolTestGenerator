@@ -15,25 +15,18 @@ def generate_tests(students_file, test_file):
     doc.packages.append(Package('titlesec'))
     doc.preamble.append(Command('titlelabel', NoEscape('\\thetitle\\enspace')))
 
-    configure_title(doc, test)
-
     for student in students:
         parse_student(doc, student, test)
 
     doc.generate_pdf(test.get_output_file_name(), clean_tex=False)
 
 
-def configure_title(doc, test):
-    doc.packages.append(Package('titling'))
-
-    # TODO
-
-
 def parse_student(doc, student, test):
     reset_page_counter(doc)
     reset_section_counter(doc)
-    # doc.append(Command('maketitle'))
+
     set_header_and_footer(doc, test.get_date(), student)
+    print_title(doc, test)
 
     doc.append(student.get_name())
     new_page(doc)
@@ -45,7 +38,12 @@ def set_header_and_footer(doc, date, student):
     doc.append(Command('lhead', NoEscape(bold(student.get_n()) + ' '
                                          + student.get_surname().upper() + ' ' + student.get_name().upper())))
     doc.append(Command('rhead', date))
-    doc.append(Command('cfoot', NoEscape('\\thepage')))
+    doc.append(Command('cfoot', Command('thepage')))
+
+
+def print_title(doc, test):
+    pass
+    # TODO
 
 
 def reset_page_counter(doc):
