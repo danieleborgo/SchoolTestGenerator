@@ -6,6 +6,7 @@
     "date": "13/12/2019",
     "duration": 60,
     "more_time_duration": 70,
+    "order_point": true,
     "test":[
         {
             "argument": "Argument 1",
