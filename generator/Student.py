@@ -1,4 +1,4 @@
-from generator.enums import TYPE
+from generator.enums import STUDENT_TYPE
 
 
 class Student:
@@ -25,9 +25,9 @@ def translate_students(students_json):
     students = []
 
     for i in range(len(students_json)):
-        student_type = TYPE.STANDARD
+        student_type = STUDENT_TYPE.STANDARD
         if 'type' in students_json[i]:
-            student_type = TYPE.translate_type(students_json[i]['type'])
+            student_type = STUDENT_TYPE.translate_type(students_json[i]['type'])
 
         students.append(
             Student(i+1, students_json[i]['name'], students_json[i]['surname'], student_type)

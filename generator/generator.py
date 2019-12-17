@@ -1,7 +1,7 @@
 import json
 from generator.Student import translate_students
 from generator.Test import Test
-from generator.enums import TYPE
+from generator.enums import STUDENT_TYPE
 from pylatex import *
 from pylatex.utils import bold
 
@@ -17,6 +17,7 @@ def generate_tests(students_file, test_file):
     doc.preamble.append(Command('titlelabel', NoEscape('\\thetitle\\enspace')))
     doc.append(Command('fontsize', arguments=['9', '9']))
     doc.packages.append(Package('geometry', 'top=3cm, left=3cm, right=3cm, bottom=2cm'))
+    doc.packages.append(Package('enumitem'))
 
     for student in students:
         parse_student(doc, student, test)
@@ -40,6 +41,10 @@ def parse_student(doc, student, test):
     print_evaluation_rule_exercise(doc)
     print_points_to_vote_table(doc, test.get_votes_data())
     print_earned_points_table(doc, test.get_points_data())
+
+    new_page(doc)
+
+    print_questions(doc, test.get_arguments())
 
     new_page(doc)
 
@@ -85,7 +90,7 @@ def print_rules(doc, duration, type):
         itemize.add_item("Il tempo a disposizione è di " + str(duration) + " minuti.")
         itemize.add_item("Non è permesso l'uso di dispositivi elettronici al di fuori della calcolatrice.")
         itemize.add_item("Non è permesso parlare o alzarsi durante la verifica.")
-        if type != TYPE.ALLOW_NOTES:
+        if type != STUDENT_TYPE.ALLOW_NOTES:
             itemize.add_item("Non è permesso l'uso degli appunti o del libro.")
         else:
             itemize.add_item("Lo studente è autorizzato ad usare i suoi appunti ma non il libro.")
@@ -97,9 +102,9 @@ def print_evaluation_rule_exercise(doc):
         ex_table.add_row([bold('100%'), 'Lo svolgimento è completo e corretto, con linguaggio pertinente.'])
         ex_table.add_row([bold('75%'), 'Lo svolgimento è incompleto, lievemente errato o con linguaggio impreciso.'])
         ex_table.add_row([bold('50%'), 'Lo svolgimento è incompleto, superficiale, ' +
-                                       'con errori diffusi o con linguaggio incerto.'])
-        ex_table.add_row([bold('25%'),  'Lo svolgimento manca di molte parti, presenta errori gravi ' +
-                                        'o con linguaggio molto insicuro.'])
+                          'con errori diffusi o con linguaggio incerto.'])
+        ex_table.add_row([bold('25%'), 'Lo svolgimento manca di molte parti, presenta errori gravi ' +
+                          'o con linguaggio molto insicuro.'])
 
 
 def print_points_to_vote_table(doc, votes_data):
@@ -122,6 +127,22 @@ def print_earned_points_table(doc, points_data):
     with doc.create(LongTable('l l', col_space='0.5cm')) as eval_table:
         eval_table.add_row(['Punteggio totale: ', '__________'])
         eval_table.add_row(['Voto: ', '__________'])
+
+
+def print_questions(doc, arguments):
+    first = True
+
+    for argument in arguments:
+        doc.append(Command('section*', argument.get_name()))
+
+        for question in argument.get_questions():
+            if first:
+                options = ''
+                first = False
+            else:
+                options = 'resume'
+            with doc.create(Enumerate(options=options)) as enum:
+                enum.add_item(question.get_text())
 
 
 def reset_page_counter(doc):
