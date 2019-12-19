@@ -8,7 +8,7 @@ class Student:
         self.__surname = surname
         self.__student_type = student_type
 
-    def get_n(self):
+    def get_register_number(self):
         return self.__n
 
     def get_name(self):

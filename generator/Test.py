@@ -2,39 +2,40 @@ from generator.enums import STUDENT_TYPE, QUESTION_TYPE
 
 
 class Test:
-    def __init__(self, json):
-        self.__extract_parameters(json)
-        self.__extract_arguments(json['test'], json['order_point'])
+    def __init__(self, test_json):
+        self.__extract_parameters(test_json)
+        self.__extract_arguments(test_json['test'])
 
         # Todo move these
         self.__votes_data = VotesData()
 
-    def __extract_parameters(self, json):
-        self.__subject = json['subject']
-        self.__subtitle = json['subtitle']
-        self.__language = json['language']
-        self.__class = json['class']
-        self.__years = json['years']
-        self.__date = json['date']
-        self.__duration = json['duration']
-        if 'more_time_duration' in json:
-            self.__more_time_duration = json['more_time_duration']
+    def __extract_parameters(self, test_json):
+        self.__subject = test_json['subject']
+        self.__subtitle = test_json['subtitle']
+        self.__language = test_json['language']
+        self.__class = test_json['class']
+        self.__years = test_json['years']
+        self.__date = test_json['date']
+        self.__duration = test_json['duration']
+        self.__extra_point_en = test_json['extra_point']
+        if 'more_time_duration' in test_json:
+            self.__more_time_duration = test_json['more_time_duration']
         else:
             self.__more_time_duration = self.__duration
 
-    def __extract_arguments(self, arguments, is_order_point_enabled):
+    def __extract_arguments(self, arguments_json):
         self.__arguments = []
         self.__number_of_questions = 0
         self.__total_points = 0
 
-        for i in range(len(arguments)):
-            argument = Argument(arguments[i])
+        for i in range(len(arguments_json)):
+            argument = Argument(arguments_json[i])
             self.__number_of_questions += argument.get_number_of_questions()
             self.__total_points += argument.get_points()
             self.__arguments.append(argument)
         self.__arguments = tuple(self.__arguments)
 
-        self.__points_data = PointsData(self.__number_of_questions, is_order_point_enabled)
+        self.__points_data = PointsData(self.__number_of_questions, self.__extra_point_en)
 
     def get_output_file_name(self):
         return self.__subtitle + '_' + self.__class
@@ -48,7 +49,7 @@ class Test:
     def get_language(self):
         return self.__language
 
-    def get_class(self):
+    def get_test_class(self):
         return self.__class
 
     def get_years(self):
@@ -70,6 +71,9 @@ class Test:
 
     def get_arguments(self):
         return self.__arguments
+
+    def is_extra_enabled(self):
+        return self.__extra_point_en
 
 
 class Argument:
@@ -107,6 +111,11 @@ class Question:
         else:
             self.__points = 1
 
+        if 'optional' in question_json:
+            self.__optional = question_json['optional']
+        else:
+            self.__optional = False
+
     def get_text(self):
         return self.__text
 
@@ -118,12 +127,12 @@ class Question:
 
 
 class PointsData:
-    def __init__(self, n, is_order_enabled):
-        self.__questions_numbers = ['Ordine'] if is_order_enabled else []
-        self.__table_string = '|c|' if is_order_enabled else '|'
+    def __init__(self, number_of_questions, is_extra_enabled):
+        self.__questions_numbers = ['Extra'] if is_extra_enabled else []
+        self.__table_string = '|c|' if is_extra_enabled else '|'
 
-        for i in range(n):
-            self.__questions_numbers.append(i+1)
+        for i in range(number_of_questions):
+            self.__questions_numbers.append(str(i + 1))
             self.__table_string += 'c|'
         self.__questions_numbers = tuple(self.__questions_numbers)
 
