@@ -10,10 +10,12 @@
   },
   {
     "name": "name3",
-    "surname": "surname3"
+    "surname": "surname3",
+    "type": "optional_questions"
   },
   {
     "name": "name4",
-    "surname": "surname4"
+    "surname": "surname4",
+    "type": "allow_notes"
   }
 ]

@@ -1,19 +1,44 @@
 {
-    "subject": "Test of Subject",
-    "subtitle": "Test argument",
+    "subject": "This is a test title",
+    "subtitle": "This is what the test matter",
     "language": "Italian",
-    "class": "class",
+    "class": "NªXY",
+    "years": "2019 - 2020",
     "date": "13/12/2019",
     "duration": 60,
     "more_time_duration": 70,
-    "order_point": true,
+    "extra_point": true,
+    "votes": {
+        "min": {
+            "vote": 2,
+            "up_to": 2
+        },
+        "max": {
+            "vote": 10,
+            "from": 10
+        },
+        "int": true
+    },
     "test":[
         {
-            "argument": "Argument 1",
+            "argument_name": "argument_name 1",
             "questions": [
                 {
                     "type": "no_space_question",
-                    "text": "Question 1"
+                    "text": "Question 1: These are values different for everyone: %n and %n",
+                    "values": [
+                        {
+                            "type": "int",
+                            "min": 0,
+                            "max": 40
+                        },
+                        {
+                            "type": "float",
+                            "min": -10,
+                            "max": -1,
+                            "digits": 2
+                        }
+                    ]
                 },
                 {
                     "type": "no_space_question",
@@ -21,20 +46,21 @@
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 3",
-                    "points": 2
+                    "text": "Question 3"
                 }
             ]
         },
         {
-            "argument": "Argument 2",
+            "argument_name": "argument_name 2",
             "questions": [
                 {
                     "type": "no_space_question",
-                    "text": "Question 4"
+                    "text": "Question 4",
+                    "optional": true
                 },
                 {
                     "type": "no_space_question",
+                    "points": 2,
                     "text": "Question 5"
                 },
                 {
@@ -44,7 +70,7 @@
             ]
         },
         {
-              "argument": "Argument 3",
+              "argument_name": "argument_name 3",
               "questions": [
                   {
                       "type": "no_space_question",
@@ -52,11 +78,25 @@
                   },
                   {
                       "type": "no_space_question",
-                      "text": "Question 8"
+                      "text": "Question 8 %n",
+                      "values": [
+                            {
+                                "type": "int",
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
                   },
                   {
                       "type": "no_space_question",
-                      "text": "Question 9"
+                      "array": true,
+                      "text": [
+                          "Question 9: \n",
+                          "A \n",
+                          "lot \n",
+                          "of \n",
+                          "text"
+                      ]
                   }
               ]
           }

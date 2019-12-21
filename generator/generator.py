@@ -1,14 +1,29 @@
 import json
 from generator.Student import translate_students
 from generator.Test import Test
-from generator.enums import STUDENT_TYPE
+from generator.enums import StudentType
 from pylatex import *
 from pylatex.utils import bold
 
 
-def generate_tests(students_file, test_file):
-    students = translate_students(json.load(open(students_file)))
-    test = Test(json.load(open(test_file)))
+def generate_tests(students_file_name, test_file_name):
+    try:
+        students_file = open(students_file_name)
+    except IOError:
+        print("Error: file " + students_file_name + " doesn't exist")
+        return
+    students = translate_students(json.load(students_file))
+    students_file.close()
+    del students_file
+
+    try:
+        test_file = open(test_file_name)
+    except IOError:
+        print("Error: file " + test_file_name + " doesn't exist")
+        return
+    test = Test(json.load(test_file))
+    test_file.close()
+    del test_file
 
     doc = Document(documentclass='article')
     doc.packages.append(Package('fancyhdr'))
@@ -19,13 +34,15 @@ def generate_tests(students_file, test_file):
     doc.packages.append(Package('geometry', 'top=2.5cm, left=3cm, right=3cm, bottom=2cm'))
     doc.packages.append(Package('enumitem'))
 
+    used_randoms_bucket = []
     for student in students:
-        parse_student(doc, student, test)
+        parse_student(doc, student, test, used_randoms_bucket)
 
     doc.generate_pdf(test.get_output_file_name(), clean_tex=False)
+    generate_used_randoms_file_if_necessary(used_randoms_bucket, test.get_bucket_name())
 
 
-def parse_student(doc, student, test):
+def parse_student(doc, student, test, used_randoms_bucket):
     reset_page_counter(doc)
     reset_section_counter(doc)  # Useless but useful for extensions
 
@@ -66,7 +83,9 @@ def parse_student(doc, student, test):
 
     new_page(doc)
 
-    print_questions(doc, test.get_arguments())
+    used_randoms = print_questions_returning_randoms(doc, test.get_arguments(), student.do_you_want_optional())
+    used_randoms.insert(0, student.get_surname())
+    used_randoms_bucket.append(used_randoms)
 
     new_page(doc)
 
@@ -113,7 +132,7 @@ def print_rules(doc, duration, student_type, is_extra_enabled):
         itemize.add_item("Non è permesso l'uso di dispositivi elettronici al di fuori della calcolatrice.")
         itemize.add_item("Non è permesso parlare o alzarsi durante la verifica.")
 
-        if student_type != STUDENT_TYPE.ALLOW_NOTES:
+        if student_type != StudentType.ALLOW_NOTES:
             itemize.add_item("Non è permesso l'uso degli appunti o del libro.")
         else:
             itemize.add_item("Lo studente è autorizzato ad usare i suoi appunti ma non il libro.")
@@ -158,9 +177,9 @@ def print_earned_points_table(doc, points_data):
         eval_table.add_row(['Voto: ', '__________'])
 
 
-def print_questions(doc, arguments):
+def print_questions_returning_randoms(doc, arguments, optional_en):
     first = True
-
+    used_randoms = []
     doc.append("Tra parentesi sono indicati i punteggi assegnabili per ogni domanda.")
 
     for argument in arguments:
@@ -173,7 +192,26 @@ def print_questions(doc, arguments):
             else:
                 options = 'resume'
             with doc.create(Enumerate(options=options)) as enum:
-                enum.add_item('(' + str(question.get_points()) + ') ' + question.get_text())
+                used_randoms += print_question_returning_randoms(enum, question, optional_en)
+    return used_randoms
+
+
+def print_question_returning_randoms(enum, question, optional_en):
+    [text, used_randoms] = question.get_text_filled()
+    to_print = '(' + str(question.get_points()) + (', facoltativa'
+               if optional_en and question.is_optional() else '') + ') ' + text
+    enum.add_item(NoEscape(to_print))
+    return used_randoms
+
+
+def generate_used_randoms_file_if_necessary(used_randoms_bucket, name):
+    if len(used_randoms_bucket[0]) > 1:
+        with open(name, 'w') as randoms:
+            for student_rands in used_randoms_bucket:
+                for element in student_rands:
+                    randoms.write(str(element) + " ")
+                randoms.write("\n")
+            randoms.close()
 
 
 def reset_page_counter(doc):

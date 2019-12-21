@@ -1,7 +1,17 @@
-from generator.enums import STUDENT_TYPE, QUESTION_TYPE
+from generator.enums import StudentType, QuestionType
+from random import randint, uniform
+
+
+RANDOM_NUMBER_TOKEN = '%n'
+NEW_LINE_TOKEN = '\n'
+NEW_LINE_LATEX = '\\\\ '
 
 
 class Test:
+    """
+        This class is supposed to optimize the file generation, reducing the
+        amount of computation avoiding to calculate same things.
+    """
     def __init__(self, test_json):
         self.__extract_parameters(test_json)
         self.__extract_arguments(test_json['test'])
@@ -15,7 +25,7 @@ class Test:
         self.__years = test_json['years']
         self.__date = test_json['date']
         self.__duration = test_json['duration']
-        self.__extra_point_en = test_json['extra_point']
+        self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
 
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
@@ -58,7 +68,7 @@ class Test:
         return self.__date
 
     def get_duration(self, student_type):
-        if student_type == STUDENT_TYPE.MORE_TIME:
+        if student_type == StudentType.MORE_TIME:
             return self.__more_time_duration
         return self.__duration
 
@@ -74,8 +84,15 @@ class Test:
     def is_extra_enabled(self):
         return self.__extra_point_en
 
+    def get_bucket_name(self):
+        return 'used_randoms_bucket_' + self.__class + '.txt'
+
 
 class Argument:
+    """
+        This class is supposed to represent an argument, so a group of
+        questions.
+    """
     def __init__(self, argument_json):
         self.__name = argument_json['argument_name']
         self.__questions = []
@@ -101,22 +118,40 @@ class Argument:
 
 
 class Question:
+    """
+        This class contains a single question with all the related data.
+    """
     def __init__(self, question_json):
-        self.__type = QUESTION_TYPE.translate_type(question_json['type'])
-        self.__text = question_json['text']
+        self.__type = QuestionType.translate_type(question_json['type'])
+        self.__points = question_json['points'] if 'points' in question_json else 1
+        self.__optional = question_json['optional'] if 'optional' in question_json else False
 
-        if 'points' in question_json:
-            self.__points = question_json['points']
+        if 'array' in question_json and question_json['array']:
+            self.__text = ''.join(iter(question_json['text']))
         else:
-            self.__points = 1
+            self.__text = question_json['text']
 
-        if 'optional' in question_json:
-            self.__optional = question_json['optional']
-        else:
-            self.__optional = False
+        self.__text = self.__text.replace(NEW_LINE_TOKEN, NEW_LINE_LATEX)
 
-    def get_text(self):
-        return self.__text
+        self.__random_handlers = []
+        n_occurrences = self.__text.count(RANDOM_NUMBER_TOKEN)
+        if n_occurrences > 0:
+            for random_json in question_json['values']:
+                self.__random_handlers.append(RandomHandler(random_json['type'],
+                                                            random_json['min'],
+                                                            random_json['max']))
+            if n_occurrences != len(self.__random_handlers):
+                print("Warning: the number of specified random generator doesn't coincide with the "
+                      + RANDOM_NUMBER_TOKEN + " found in:")
+                print(self.__text)
+
+    def get_text_filled(self):
+        text = self.__text
+        random_nums = []
+        for i in range(len(self.__random_handlers)):
+            random_nums.insert(i, self.__random_handlers[i].get_random())
+            text = text.replace(RANDOM_NUMBER_TOKEN, str(random_nums[i]), 1)
+        return [text, random_nums]
 
     def get_type(self):
         return self.__type
@@ -124,8 +159,38 @@ class Question:
     def get_points(self):
         return self.__points
 
+    def is_optional(self):
+        return self.__optional
+
+
+class RandomHandler:
+    """
+        This class handles the random number generation for a single token.
+        It contains all its configuration parameters.
+    """
+    def __init__(self, rand_type, start, end):
+        self.__start = start
+        self.__end = end
+
+        if 'float'.__eq__(rand_type):
+            self.__size = 2
+            self.__random_generator = self.__get_limited_float
+        else:
+            if not 'int'.__eq__(rand_type):
+                print("Warning: unknow type " + rand_type)
+            self.__random_generator = randint
+
+    def __get_limited_float(self, start, end):
+        return round(uniform(start, end), self.__size)
+
+    def get_random(self):
+        return self.__random_generator(self.__start, self.__end)
+
 
 class PointsData:
+    """
+        This class is used to support the generation of the earned point table.
+    """
     def __init__(self, number_of_questions, is_extra_enabled):
         self.__questions_numbers = ['Extra'] if is_extra_enabled else []
         self.__table_string = '|c|' if is_extra_enabled else '|'
@@ -143,10 +208,12 @@ class PointsData:
 
 
 class VotesData:
+    """
+        This class supports the generation of the vote tables.
+    """
     def __init__(self, total_points, votes_json):
-        # TODO fix this
-        self.__points = ['Punti']  # ('Punti', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        self.__votes = ['Voto']  # ('Voto', 3, 3, 3, 4, 5, 6, 7, 8, 9, 10)
+        self.__points = ['Punti']
+        self.__votes = ['Voto']
         self.__table_string = '|c|'
 
         min_vote = votes_json['min']['vote']
