@@ -135,29 +135,33 @@ def print_evaluation_rule_exercise(doc):
 
 
 def print_points_to_vote_table(doc, votes_data):
-    with doc.create(LongTable(votes_data.get_table_string(), row_height=1.5)) as votes_table:
+    with doc.create(LongTable(votes_data.get_table_string(), row_height=1.5, col_space='0.5cm')) as votes_table:
         votes_table.add_hline()
         votes_table.add_row(votes_data.get_points())
         votes_table.add_hline()
         votes_table.add_row(votes_data.get_votes())
         votes_table.add_hline()
+    doc.append(Command('vspace', NoEscape('-0.5em')))
 
 
 def print_earned_points_table(doc, points_data):
-    with doc.create(LongTable(points_data.get_table_string(), row_height=2.0)) as eval_table:
+    with doc.create(LongTable(points_data.get_table_string(), row_height=2.0, col_space='0.5cm')) as eval_table:
         eval_table.add_hline()
         eval_table.add_row(points_data.get_questions_numbers())
         eval_table.add_hline()
         eval_table.add_empty_row()
         eval_table.add_hline()
+    doc.append(Command('vspace', NoEscape('-1em')))
 
-    with doc.create(LongTable('l l', col_space='0.5cm')) as eval_table:
+    with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
         eval_table.add_row(['Punteggio totale: ', '__________'])
         eval_table.add_row(['Voto: ', '__________'])
 
 
 def print_questions(doc, arguments):
     first = True
+
+    doc.append("Tra parentesi sono indicati i punteggi assegnabili per ogni domanda.")
 
     for argument in arguments:
         doc.append(Command('section*', argument.get_name()))
@@ -169,7 +173,7 @@ def print_questions(doc, arguments):
             else:
                 options = 'resume'
             with doc.create(Enumerate(options=options)) as enum:
-                enum.add_item(question.get_text())
+                enum.add_item('(' + str(question.get_points()) + ') ' + question.get_text())
 
 
 def reset_page_counter(doc):

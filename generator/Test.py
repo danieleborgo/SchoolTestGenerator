@@ -5,9 +5,7 @@ class Test:
     def __init__(self, test_json):
         self.__extract_parameters(test_json)
         self.__extract_arguments(test_json['test'])
-
-        # Todo move these
-        self.__votes_data = VotesData()
+        self.__votes_data = VotesData(self.__total_points, test_json['votes'])
 
     def __extract_parameters(self, test_json):
         self.__subject = test_json['subject']
@@ -18,6 +16,7 @@ class Test:
         self.__date = test_json['date']
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point']
+
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
         else:
@@ -26,7 +25,7 @@ class Test:
     def __extract_arguments(self, arguments_json):
         self.__arguments = []
         self.__number_of_questions = 0
-        self.__total_points = 0
+        self.__total_points = 1 if self.__extra_point_en else 0
 
         for i in range(len(arguments_json)):
             argument = Argument(arguments_json[i])
@@ -144,11 +143,27 @@ class PointsData:
 
 
 class VotesData:
-    def __init__(self):
+    def __init__(self, total_points, votes_json):
         # TODO fix this
-        self.__points = ('Punti', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        self.__votes = ('Voto', 3, 3, 3, 4, 5, 6, 7, 8, 9, 10)
-        self.__table_string = '|c|c|c|c|c|c|c|c|c|c|c|'
+        self.__points = ['Punti']  # ('Punti', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        self.__votes = ['Voto']  # ('Voto', 3, 3, 3, 4, 5, 6, 7, 8, 9, 10)
+        self.__table_string = '|c|'
+
+        min_vote = votes_json['min']['vote']
+        up_to_this = votes_json['min']['up_to']
+        max_vote = votes_json['max']['vote']
+        from_this = votes_json['max']['from']
+        int_en = votes_json['int']
+
+        vote_step = (max_vote - min_vote) / (from_this - up_to_this)
+        vote = float(min_vote)
+
+        for i in range(1, total_points + 1):
+            if up_to_this < i <= from_this:
+                vote += vote_step
+            self.__points.append(i)
+            self.__votes.append(round(vote, 1) if not int_en else int(vote))
+            self.__table_string += 'c|'
 
     def get_points(self):
         return self.__points
