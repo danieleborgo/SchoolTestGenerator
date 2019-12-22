@@ -6,13 +6,13 @@ tests all different between them. The tests are thought to be printed
 or to be sent to the students. There is no automatic correction,
 since the answers may be directly written on paper.
 
-### Required installed software
+## Required installed software
 
 This software was written using **Python 3.6** with the package
 **PyLaTex**. It also requires an installed version of **LaTex**,
 which has to have downloaded all the necessary packages.
 
-### How to run
+## How to run
 
 This program needs two files in input:
 
@@ -29,12 +29,12 @@ packages. The names are only symbolic.
 This software was developed using PyCharm, which can 
 simplify the execution and the package installation of this software.
 
-### Example of use
+## Example of use
 
 The folder _json_ contains two JSON files that show completely all the
 available features of this software.
 
-### How to create **_student.json_**
+## How to create **_student.json_**
 
 This file is made by an array containing all the students data in form
 of objects. These lasts have these fields: **_name_**, **_surname_** and
@@ -45,7 +45,7 @@ decided for each situation. The allowed types are: **_more_time_**,
 **_standard_**. If not specified, the student is assumed to have a 
 standard test.
 
-### How to create **_text.json_**
+## How to create **_text.json_**
 
 This file has a lot of parameters, these are the single value ones:
 
@@ -63,7 +63,7 @@ specified.
 generation of an extra point for answers graphical order and for the
 rules respect.
 
-#### The parameter **_votes_**
+### The parameter **_votes_**
 
 This section is used to generate the table to convert earned points
 to a vote in tenths. It is made by three parameters:
@@ -77,7 +77,7 @@ in integers.
 
 The votes inside the two limiters are computed at runtime.
 
-#### The parameter **_arguments_**
+### The parameter **_arguments_**
 
 This is the section that contains the real test and all its
 questions. It is organized as an array of arguments, that represent
