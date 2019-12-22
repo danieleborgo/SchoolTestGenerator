@@ -21,11 +21,11 @@
     },
     "test":[
         {
-            "argument_name": "argument_name 1",
+            "argument_name": "Different random values",
             "questions": [
                 {
                     "type": "no_space_question",
-                    "text": "Question 1: These are values different for everyone: %n and %n",
+                    "text": "Question 1: These are values different for everyone: %n (int) and %n (float).",
                     "values": [
                         {
                             "type": "int",
@@ -42,63 +42,101 @@
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 2"
+                    "text": "Question 2: This is a random value from a set: %n",
+                    "values": [
+                        {
+                            "type": "set",
+                            "set": [
+                                "one",
+                                "two",
+                                "three"
+                            ]
+                        }
+                    ]
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 3"
+                    "text": "Question 3: This question is standard"
                 }
             ]
         },
         {
-            "argument_name": "argument_name 2",
+            "argument_name": "Different points and optionality",
             "questions": [
                 {
                     "type": "no_space_question",
-                    "text": "Question 4",
+                    "text": "Question 4: This question is optional for someone",
                     "optional": true
                 },
                 {
                     "type": "no_space_question",
-                    "points": 2,
-                    "text": "Question 5"
+                    "text": "Question 5: This question has three points",
+                    "points": 3
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 6"
+                    "text": "Question 6: This question has no points",
+                    "points": 0
                 }
             ]
         },
         {
-              "argument_name": "argument_name 3",
+              "argument_name": "Set of different representation and new line",
               "questions": [
                   {
                       "type": "no_space_question",
-                      "text": "Question 7"
-                  },
-                  {
-                      "type": "no_space_question",
-                      "text": "Question 8 %n",
-                      "values": [
-                            {
-                                "type": "int",
-                                "min": 20,
-                                "max": 30
-                            }
-                        ]
+                      "text": "Question 7:\nHere is possible doing this\nin a single\nstring"
                   },
                   {
                       "type": "no_space_question",
                       "array": true,
                       "text": [
-                          "Question 9: \n",
-                          "A \n",
-                          "lot \n",
-                          "of \n",
-                          "text"
+                          "Question 8: \n",
+                          "This ",
+                          "question ",
+                          "is ",
+                          "stored ",
+                          "in ",
+                          "form of an array in the JSON file."
                       ]
                   }
               ]
-          }
+        },
+        {
+            "argument_name": "Combining all these stuff",
+            "questions": [
+                {
+                    "type": "no_space_question",
+                    "points": 2,
+                    "optional": true,
+                    "array": true,
+                    "text": [
+                        "Question 9: \n",
+                        "Hello, take some different values: %n, %n and %n."
+                    ],
+                    "values": [
+                        {
+                            "type": "int",
+                            "min": 0,
+                            "max": 10
+                        },
+                        {
+                            "type": "float",
+                            "min": 10,
+                            "max": 20,
+                            "digits": 4
+                        },
+                        {
+                            "type": "set",
+                            "set": [
+                                "Hello",
+                                "Hi",
+                                "Good morning"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
     ]
 }

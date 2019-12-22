@@ -1,5 +1,5 @@
 from generator.enums import StudentType, QuestionType
-from random import randint, uniform
+from random import randint, uniform, choice
 
 
 RANDOM_NUMBER_TOKEN = '%n'
@@ -15,7 +15,6 @@ class Test:
     def __init__(self, test_json):
         self.__extract_parameters(test_json)
         self.__extract_arguments(test_json['test'])
-        self.__votes_data = VotesData(self.__total_points, test_json['votes'])
 
     def __extract_parameters(self, test_json):
         self.__subject = test_json['subject']
@@ -26,6 +25,7 @@ class Test:
         self.__date = test_json['date']
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
+        self.__votes_data = VotesData(test_json['votes'])
 
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
@@ -137,9 +137,7 @@ class Question:
         n_occurrences = self.__text.count(RANDOM_NUMBER_TOKEN)
         if n_occurrences > 0:
             for random_json in question_json['values']:
-                self.__random_handlers.append(RandomHandler(random_json['type'],
-                                                            random_json['min'],
-                                                            random_json['max']))
+                self.__random_handlers.append(RandomHandler(random_json))
             if n_occurrences != len(self.__random_handlers):
                 print("Warning: the number of specified random generator doesn't coincide with the "
                       + RANDOM_NUMBER_TOKEN + " found in:")
@@ -168,23 +166,40 @@ class RandomHandler:
         This class handles the random number generation for a single token.
         It contains all its configuration parameters.
     """
-    def __init__(self, rand_type, start, end):
-        self.__start = start
-        self.__end = end
+    def __init__(self, random_json):
+        rand_type = random_json['type']
+
+        if 'set'.__eq__(rand_type):
+            self.__set = tuple(random_json['set'])
+            self.__random_generator = self.__get_from_set
+            return
 
         if 'float'.__eq__(rand_type):
             self.__size = 2
+            self.__start = random_json['min']
+            self.__end = random_json['max']
             self.__random_generator = self.__get_limited_float
-        else:
-            if not 'int'.__eq__(rand_type):
-                print("Warning: unknow type " + rand_type)
-            self.__random_generator = randint
+            return
 
-    def __get_limited_float(self, start, end):
-        return round(uniform(start, end), self.__size)
+        if 'int'.__eq__(rand_type):
+            self.__start = random_json['min']
+            self.__end = random_json['max']
+            self.__random_generator = self.__get_limited_int
+            return
+
+        raise Exception("Unknown random value type: " + rand_type)
+
+    def __get_from_set(self):
+        return choice(self.__set)
+
+    def __get_limited_int(self):
+        return randint(self.__start, self.__end)
+
+    def __get_limited_float(self):
+        return round(uniform(self.__start, self.__end), self.__size)
 
     def get_random(self):
-        return self.__random_generator(self.__start, self.__end)
+        return self.__random_generator()
 
 
 class PointsData:
@@ -211,10 +226,10 @@ class VotesData:
     """
         This class supports the generation of the vote tables.
     """
-    def __init__(self, total_points, votes_json):
+    def __init__(self, votes_json):
         self.__points = ['Punti']
         self.__votes = ['Voto']
-        self.__table_string = '|c|'
+        self.__table_string = '|c|c|c|'
 
         min_vote = votes_json['min']['vote']
         up_to_this = votes_json['min']['up_to']
@@ -225,12 +240,15 @@ class VotesData:
         vote_step = (max_vote - min_vote) / (from_this - up_to_this)
         vote = float(min_vote)
 
-        for i in range(1, total_points + 1):
-            if up_to_this < i <= from_this:
-                vote += vote_step
+        self.__points.append('Fino a ' + str(up_to_this))
+        self.__votes.append(min_vote)
+        for i in range(up_to_this + 1, from_this):
+            vote += vote_step
             self.__points.append(i)
             self.__votes.append(round(vote, 1) if not int_en else int(vote))
             self.__table_string += 'c|'
+        self.__points.append('Da ' + str(from_this))
+        self.__votes.append(max_vote)
 
     def get_points(self):
         return self.__points
