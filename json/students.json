@@ -1,20 +1,20 @@
 [
   {
-    "name": "name1",
+    "name": "Standard",
     "surname": "surname1"
   },
   {
-    "name": "name2",
+    "name": "More Time",
     "surname": "surname2",
     "type": "more_time"
   },
   {
-    "name": "name3",
+    "name": "Optional Questions",
     "surname": "surname3",
     "type": "optional_questions"
   },
   {
-    "name": "name4",
+    "name": "Allow Notes",
     "surname": "surname4",
     "type": "allow_notes"
   }

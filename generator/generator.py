@@ -10,8 +10,7 @@ def generate_tests(students_file_name, test_file_name):
     try:
         students_file = open(students_file_name)
     except IOError:
-        print("Error: file " + students_file_name + " doesn't exist")
-        return
+        raise Exception("The file " + students_file_name + " doesn't exist")
     students = translate_students(json.load(students_file))
     students_file.close()
     del students_file
@@ -19,8 +18,7 @@ def generate_tests(students_file_name, test_file_name):
     try:
         test_file = open(test_file_name)
     except IOError:
-        print("Error: file " + test_file_name + " doesn't exist")
-        return
+        raise Exception("The file " + test_file_name + " doesn't exist")
     test = Test(json.load(test_file))
     test_file.close()
     del test_file
@@ -78,12 +76,22 @@ def parse_student(doc, student, test, used_randoms_bucket):
 
     doc.append(Command('section*', 'Valutazione'))
     print_evaluation_rule_exercise(doc)
-    print_points_to_vote_table(doc, test.get_votes_data())
-    print_earned_points_table(doc, test.get_points_data())
+    print_points_to_vote_table(
+        doc=doc,
+        votes_data=test.get_votes_data()
+    )
+    print_earned_points_table(
+        doc=doc,
+        points_data=test.get_points_data()
+    )
 
     new_page(doc)
 
-    used_randoms = print_questions_returning_randoms(doc, test.get_arguments(), student.do_you_want_optional())
+    used_randoms = print_questions_returning_randoms(
+        doc=doc,
+        arguments=test.get_arguments(),
+        optional_en=student.do_you_want_optional()
+    )
     used_randoms.insert(0, student.get_surname())
     used_randoms_bucket.append(used_randoms)
 
@@ -173,7 +181,7 @@ def print_earned_points_table(doc, points_data):
     doc.append(Command('vspace', NoEscape('-1em')))
 
     with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
-        eval_table.add_row(['Punteggio totale: ', '__________'])
+        eval_table.add_row(['Punteggio (' + str(points_data.get_total_points()) + '): ', '__________'])
         eval_table.add_row(['Voto: ', '__________'])
 
 
@@ -198,8 +206,8 @@ def print_questions_returning_randoms(doc, arguments, optional_en):
 
 def print_question_returning_randoms(enum, question, optional_en):
     [text, used_randoms] = question.get_text_filled()
-    to_print = '(' + str(question.get_points()) + (', facoltativa'
-               if optional_en and question.is_optional() else '') + ') ' + text
+    to_print = '(' + str(question.get_points()) + \
+               (', facoltativa' if optional_en and question.is_optional() else '') + ') ' + text
     enum.add_item(NoEscape(to_print))
     return used_randoms
 

@@ -1,6 +1,6 @@
 {
     "subject": "This is a test title",
-    "subtitle": "This is what the test matter",
+    "subtitle": "This is the test matter",
     "language": "Italian",
     "class": "NªXY",
     "years": "2019 - 2020",
@@ -42,7 +42,7 @@
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 2: This is a random value from a set: %n",
+                    "text": "Question 2: This is a random value from a set: %n.",
                     "values": [
                         {
                             "type": "set",
@@ -56,7 +56,7 @@
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 3: This question is standard"
+                    "text": "Question 3: This question is standard."
                 }
             ]
         },
@@ -65,27 +65,27 @@
             "questions": [
                 {
                     "type": "no_space_question",
-                    "text": "Question 4: This question is optional for someone",
+                    "text": "Question 4: This question is optional for someone.",
                     "optional": true
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 5: This question has three points",
+                    "text": "Question 5: This question has three points.",
                     "points": 3
                 },
                 {
                     "type": "no_space_question",
-                    "text": "Question 6: This question has no points",
+                    "text": "Question 6: This question has no points.",
                     "points": 0
                 }
             ]
         },
         {
-              "argument_name": "Set of different representation and new line",
+              "argument_name": "Set of different representations and new lines",
               "questions": [
                   {
                       "type": "no_space_question",
-                      "text": "Question 7:\nHere is possible doing this\nin a single\nstring"
+                      "text": "Question 7:\nHere is possible doing this\nin a single\nstring."
                   },
                   {
                       "type": "no_space_question",
@@ -103,7 +103,7 @@
               ]
         },
         {
-            "argument_name": "Combining all these stuff",
+            "argument_name": "Combining all this stuff",
             "questions": [
                 {
                     "type": "no_space_question",
