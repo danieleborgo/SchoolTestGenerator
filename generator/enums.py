@@ -9,6 +9,9 @@ class StudentType(Enum):
 
     @staticmethod
     def translate_type(string):
+        if 'standard'.__eq__(string):
+            return StudentType.STANDARD
+
         if 'more_time'.__eq__(string):
             return StudentType.MORE_TIME
 
