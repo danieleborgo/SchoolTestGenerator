@@ -34,6 +34,26 @@ simplify the execution and the package installation of this software.
 The folder _json_ contains two JSON files that show completely all the
 available features of this software.
 
+## How it works
+
+This generator structure is generic and allows easy and fast
+modification. It is made by a function that:
+
+- Extracts the information from the tho JSONs, storing them is apposite
+structures, decorating them with various data to improve the
+performances;
+- For each student, calls a proper function that generates a test
+following school directives for different needs, as the school
+established;
+- Creates a file containing all the random values used in the test
+in function of each student, in order to simplify correction.
+
+The function that generates a single test in function of the student
+calls other ones, specific for this type of test. In order to change the
+behaviour of the generator, it's necessary modifying these invocations.
+
+Further information are given in the [generator package](./generator).
+
 ## How to create **_student.json_**
 
 This file is made by an array containing all the students data in form
@@ -59,9 +79,12 @@ This file has a lot of parameters, these are the single value ones:
 - **_more_time_duration_** (optional): this is the duration for the
 students who need more time and it is equal to the previous if not
 specified.
-- **_extra_point_** (optional): if set and true, it enable the 
+- **_extra_point_** (optional): if set and true, it enables the 
 generation of an extra point for answers graphical order and for the
-rules respect.
+rules respect;
+- **_extra_params_** (optional): this field contains an array of string,
+representing some external things to evaluate for giving the grade,
+like homework or projects.
 
 ### The parameter **_votes_**
 
@@ -72,8 +95,8 @@ to a vote in tenths. It is made by three parameters:
 points through the fields **_vote_** and **_up_to_** inside of it.
 - **_max_**: this specifies the maximum allowed vote and its related
 points through the fields **_vote_** and **_from_** inside of it.
-- **_int_** (optional): this flag forces the program to convert the votes
-in integers.
+- **_int_** (optional): this flag forces the program to convert the
+votes in integers.
 
 The votes inside the two limiters are computed at runtime.
 
@@ -89,12 +112,13 @@ An argument is composed by an **_argument_name_** and an array of
 - **_type_**: this defines the question category.
 - **_text_**: this contains the question in form of string or in form
 of strings array if the flag **_array_** is set to true. It can contain
-several _%n_ that will be substituted with a random value chosen
+several **_%n_** that will be substituted with a random value chosen
 according to the rules of the following point.
 - **_values_**: this field, optional if the **_text_** doesn't contain
 any **_%n_**, specifies the policies to follow for the value to 
 substitute. For each token in the **_text_** it is necessary specify 
-one policy. There are three policies, stored in the parameter **_type_**:
+one policy. There are three policies, stored in the parameter 
+**_type_**:
     - **_int_**: this generates an integer in the given interval 
     [**_min_**, **_max_**];
     - **_float_**: this generates a float in the given interval 
@@ -105,5 +129,5 @@ one policy. There are three policies, stored in the parameter **_type_**:
 students who need less questions.
 - **_points_** (optional): define the value in points of the question
 and, if not specified, its value is one.
-- **_array_** (optional): if set and true it defines the field **_text_**
-as an array of string the program will concatenate.
+- **_array_** (optional): if set and true it defines the field
+**_text_** as an array of string the program will concatenate.

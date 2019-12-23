@@ -14,7 +14,6 @@ class Test:
 
     def __init__(self, test_json):
         self.__extract_parameters(test_json)
-        self.__extract_arguments(test_json['test'])
 
     def __extract_parameters(self, test_json):
         self.__subject = test_json['subject']
@@ -25,12 +24,22 @@ class Test:
         self.__date = test_json['date']
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
+        self.__project_en = test_json['project'] if 'project' in test_json else False
         self.__votes_data = VotesData(test_json['votes'])
 
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
         else:
             self.__more_time_duration = self.__duration
+
+        total_points = self.__extract_arguments(test_json['test'])
+
+        self.__points_data = PointsData(
+            total_points=total_points,
+            number_of_questions=self.__number_of_questions,
+            is_extra_enabled=self.__extra_point_en,
+            extra_params=test_json['extra_params'] if 'extra_params' in test_json else []
+        )
 
     def __extract_arguments(self, arguments_json):
         self.__arguments = []
@@ -43,8 +52,7 @@ class Test:
             total_points += argument.get_points()
             self.__arguments.append(argument)
         self.__arguments = tuple(self.__arguments)
-
-        self.__points_data = PointsData(total_points, self.__number_of_questions, self.__extra_point_en)
+        return total_points
 
     def get_output_file_name(self):
         return self.__subtitle + '_' + self.__class
@@ -209,10 +217,13 @@ class PointsData:
         This class is used to support the generation of the earned point table.
     """
 
-    def __init__(self, total_points, number_of_questions, is_extra_enabled):
+    def __init__(self, total_points, number_of_questions, is_extra_enabled, extra_params):
         self.__total_points = total_points
         self.__questions_numbers = ['Extra'] if is_extra_enabled else []
         self.__table_string = '|c|' if is_extra_enabled else '|'
+
+        self.__questions_numbers += extra_params
+        self.__table_string += 'c|' * len(extra_params)
 
         for i in range(number_of_questions):
             self.__questions_numbers.append(str(i + 1))
