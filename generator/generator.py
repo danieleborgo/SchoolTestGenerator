@@ -1,9 +1,9 @@
-import json
+from json import load as json_load
+from pylatex import *
+from pylatex.utils import bold
 from generator.Student import translate_students
 from generator.Test import Test
 from generator.enums import StudentType
-from pylatex import *
-from pylatex.utils import bold
 
 
 def generate_tests(students_file_name, test_file_name):
@@ -11,7 +11,7 @@ def generate_tests(students_file_name, test_file_name):
         students_file = open(students_file_name)
     except IOError:
         raise Exception("The file " + students_file_name + " doesn't exist")
-    students = translate_students(json.load(students_file))
+    students = translate_students(json_load(students_file))
     students_file.close()
     del students_file
 
@@ -19,7 +19,7 @@ def generate_tests(students_file_name, test_file_name):
         test_file = open(test_file_name)
     except IOError:
         raise Exception("The file " + test_file_name + " doesn't exist")
-    test = Test(json.load(test_file))
+    test = Test(json_load(test_file))
     test_file.close()
     del test_file
 
@@ -172,12 +172,7 @@ def print_points_to_vote_table(doc, votes_data):
 
 
 def print_earned_points_table(doc, points_data):
-    with doc.create(LongTable(points_data.get_table_string(), row_height=2.0, col_space='0.5cm')) as eval_table:
-        eval_table.add_hline()
-        eval_table.add_row(points_data.get_questions_numbers())
-        eval_table.add_hline()
-        eval_table.add_empty_row()
-        eval_table.add_hline()
+    points_data.insert_eval_table(doc)
     doc.append(Command('vspace', NoEscape('-1em')))
 
     with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
