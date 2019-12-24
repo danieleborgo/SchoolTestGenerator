@@ -19,8 +19,7 @@
         "max": {
             "vote": 10,
             "from": 10
-        },
-        "int": true
+        }
     },
     "test":[
         {

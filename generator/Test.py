@@ -1,4 +1,5 @@
 from random import seed
+from warnings import warn
 from generator.enums import StudentType
 from generator.Argument import Argument
 from generator.test_support import PointsData, VotesData
@@ -27,6 +28,9 @@ class Test:
 
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
+
+            if self.__more_time_duration < self.__duration:
+                warn("The quantity specified as more_time_duration are lower than normal duration")
         else:
             self.__more_time_duration = self.__duration
 

@@ -44,9 +44,6 @@ extracts all the data from the JSON and, eventually, it completes the
 optional parameters with default values. If it's necessary add further
 parameters in the JSON, this is the place where they have to be parsed.
 
-The classes **_PointsData_** and **_VotesData_** optimize the table
-generation.
-
 ## [Argument.py](./Argument.py)
 
 The class **_Argument_** represents the JSON parameter equivalent and
@@ -55,3 +52,8 @@ contains a group of questions
 The class **_Question_** represent, obviously, a simple question and 
 all its related data, like points and random values handler, managed
 through **_RandomHandler_**.
+
+## [test_support.py](./test_support.py)
+
+The classes **_PointsData_** and **_VotesData_** optimize their
+table generation.

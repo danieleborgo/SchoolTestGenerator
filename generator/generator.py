@@ -35,9 +35,13 @@ def generate_tests(students_file_name, test_file_name):
     used_randoms_bucket = []
     for student in students:
         parse_student(doc, student, test, used_randoms_bucket)
+    print("Generated " + str(len(students)) + " tests")
 
     doc.generate_pdf(test.get_output_file_name(), clean_tex=False)
-    generate_used_randoms_file_if_necessary(used_randoms_bucket, test.get_bucket_name())
+    print("Generated the PDF file")
+
+    if generate_used_randoms_file_if_necessary(used_randoms_bucket, test.get_bucket_name()):
+        print("Generated random values used file")
 
 
 def parse_student(doc, student, test, used_randoms_bucket):
@@ -78,7 +82,8 @@ def parse_student(doc, student, test, used_randoms_bucket):
     print_evaluation_rule_exercise(doc)
     print_points_to_vote_table(
         doc=doc,
-        votes_data=test.get_votes_data()
+        votes_data=test.get_votes_data(),
+        student_type=student.get_student_type()
     )
     print_earned_points_table(
         doc=doc,
@@ -161,13 +166,8 @@ def print_evaluation_rule_exercise(doc):
                           'o con linguaggio molto insicuro.'])
 
 
-def print_points_to_vote_table(doc, votes_data):
-    with doc.create(LongTable(votes_data.get_table_string(), row_height=1.5, col_space='0.5cm')) as votes_table:
-        votes_table.add_hline()
-        votes_table.add_row(votes_data.get_points())
-        votes_table.add_hline()
-        votes_table.add_row(votes_data.get_votes())
-        votes_table.add_hline()
+def print_points_to_vote_table(doc, votes_data, student_type):
+    votes_data.insert_table(doc, student_type)
     doc.append(Command('vspace', NoEscape('-0.5em')))
 
 
@@ -215,6 +215,8 @@ def generate_used_randoms_file_if_necessary(used_randoms_bucket, name):
                     randoms.write(str(element) + " ")
                 randoms.write("\n")
             randoms.close()
+        return True
+    return False
 
 
 def reset_page_counter(doc):

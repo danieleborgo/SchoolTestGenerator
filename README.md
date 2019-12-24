@@ -95,8 +95,6 @@ to a vote in tenths. It is made by three parameters:
 points through the fields **_vote_** and **_up_to_** inside of it.
 - **_max_**: this specifies the maximum allowed vote and its related
 points through the fields **_vote_** and **_from_** inside of it.
-- **_int_** (optional): this flag forces the program to convert the
-votes in integers.
 
 The votes inside the two limiters are computed at runtime.
 

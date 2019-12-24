@@ -1,9 +1,11 @@
-from generator.generator import generate_tests
 import sys
+from generator.generator import generate_tests
 
 if __name__ == '__main__':
+    print("TEST GENERATOR")
+
     if len(sys.argv) < 2:
-        print("Error: two parameters are requested")
+        raise Exception("Two parameters are requested")
     else:
         generate_tests(
             students_file_name=sys.argv[1],

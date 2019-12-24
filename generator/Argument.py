@@ -21,7 +21,7 @@ class Argument:
         for i in range(len(argument_json['questions'])):
             question = Question(argument_json['questions'][i])
             self.__points += question.get_points()
-            self.__optionals_count += 1 if question.is_optional() else 0
+            self.__optionals_count += question.get_points() if question.is_optional() else 0
             self.__questions.append(question)
         self.__questions = tuple(self.__questions)
 

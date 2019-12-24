@@ -1,4 +1,5 @@
 from enum import Enum
+from warnings import warn
 
 
 class StudentType(Enum):
@@ -21,7 +22,7 @@ class StudentType(Enum):
         if 'optional_questions'.__eq__(string):
             return StudentType.OPTIONAL_QUESTIONS
 
-        print("Warning: type "+string+" unknown")
+        warn("type "+string+" unknown, set it to STANDARD")
         return StudentType.STANDARD
 
 
@@ -34,5 +35,5 @@ class QuestionType(Enum):
         if 'no_space_question'.__eq__(string):
             return QuestionType.NO_SPACED_QUESTION
 
-        print("Warning: type " + string + " unknown")
+        warn("type " + string + " unknown, set it to NO_SPACED_QUESTION")
         return QuestionType.UNDEFINED

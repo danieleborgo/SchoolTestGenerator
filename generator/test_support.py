@@ -1,4 +1,6 @@
-from pylatex import LongTable
+from math import ceil
+from pylatex import LongTable, NoEscape
+from generator.enums import StudentType
 
 
 class PointsData:
@@ -10,7 +12,7 @@ class PointsData:
         self.__total_points = total_points
 
         questions_numbers = ['Extra'] if is_extra_enabled else []
-        questions_numbers += extra_params + list(range(1, number_of_questions+1))
+        questions_numbers += extra_params + list(range(1, number_of_questions + 1))
 
         table_string = '|c|' if is_extra_enabled else '|'
         table_string += 'c|' * (len(extra_params) + number_of_questions)
@@ -38,37 +40,56 @@ class VotesData:
     """
 
     def __init__(self, votes_json, optional_count):
-        self.__points = ['Punti']
-        self.__votes = ['Voto']
-        self.__table_string = '|c|c|c|'
-
         min_vote = votes_json['min']['vote']
         min_required_points = votes_json['min']['up_to']
-
         max_vote = votes_json['max']['vote']
         max_required_points = votes_json['max']['from']
 
-        int_en = votes_json['int']
+        string_st, points_st, votes_st = self.__create_earned_votes_array(max_vote, max_required_points,
+                                                                          min_vote, min_required_points)
+        string_wo, points_wo, votes_wo = self.__create_earned_votes_array(max_vote, max_required_points-optional_count,
+                                                                          min_vote, min_required_points)
+
+        self.__standard_votes_table = self.__create_table(string_st, points_st, votes_st)
+        self.__votes_with_opt_table = self.__create_table(string_wo, points_wo, votes_wo)
+
+    def __create_earned_votes_array(self, max_vote, max_required_points, min_vote, min_required_points):
+        table_string = '|c|c|c|' + 'c|' * (max_required_points - min_required_points - 1)
+
+        points_row = ['Punti', NoEscape('$ \\leq ' + str(min_required_points) + ' $')]
+        points_row += list(range(min_required_points + 1, max_required_points))
+        points_row.append(NoEscape('$ ' + '\\geq ' + str(max_required_points) + ' $'))
 
         vote_step = (max_vote - min_vote) / (max_required_points - min_required_points)
-
-        vote = float(min_vote)
-
-        self.__points.append('Fino a ' + str(min_required_points))
-        self.__votes.append(min_vote)
+        vote_acc = float(min_vote)
+        votes_row = ['Voto', min_vote]
         for i in range(min_required_points + 1, max_required_points):
-            vote += vote_step
-            self.__points.append(i)
-            self.__votes.append(round(vote, 1) if not int_en else int(vote))
-            self.__table_string += 'c|'
-        self.__points.append('Da ' + str(max_required_points))
-        self.__votes.append(max_vote)
+            vote_acc += vote_step
+            votes_row.append(self.VoteConverter.to_vote(vote_acc))
+        votes_row.append(max_vote)
 
-    def get_points(self):
-        return self.__points
+        return [table_string, points_row, votes_row]
 
-    def get_votes(self):
-        return self.__votes
+    @staticmethod
+    def __create_table(table_string, points, standard_votes):
+        table = LongTable(table_string, row_height=1.5, col_space='0.5cm')
+        table.add_hline()
+        table.add_row(points)
+        table.add_hline()
+        table.add_row(standard_votes)
+        table.add_hline()
+        return table
 
-    def get_table_string(self):
-        return self.__table_string
+    def insert_table(self, doc, student_type):
+        if StudentType.OPTIONAL_QUESTIONS == student_type:
+            doc.append(self.__votes_with_opt_table)
+        else:
+            doc.append(self.__standard_votes_table)
+
+    class VoteConverter:
+        __vote_table = ('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5',
+                        '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10')
+
+        @staticmethod
+        def to_vote(n):
+            return VotesData.VoteConverter.__vote_table[ceil(n * 2) % 20]
