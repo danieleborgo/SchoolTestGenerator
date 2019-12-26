@@ -50,6 +50,8 @@ class QuestionType(Enum):
     # This type describes a question represented by only a question, without adding extra space
     NO_SPACED_QUESTION = 0
 
+    SPACED_QUESTION = 1
+
     @staticmethod
     def translate_type(string):
         """
@@ -59,5 +61,8 @@ class QuestionType(Enum):
 
         if 'no_space_question'.__eq__(string):
             return QuestionType.NO_SPACED_QUESTION
+
+        if 'spaced_question'.__eq__(string):
+            return QuestionType.SPACED_QUESTION
 
         raise Exception("Type " + string + " unknown.")

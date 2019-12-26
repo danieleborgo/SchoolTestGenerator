@@ -64,6 +64,13 @@ class Question:
 
         if self.__type == QuestionType.NO_SPACED_QUESTION:
             self.__extract_standard_question(question_json)
+            self.__print_question = self.__print_no_space_question_ret_randoms
+            return
+
+        if self.__type == QuestionType.SPACED_QUESTION:
+            self.__extract_standard_question(question_json)
+            self.__appendix = NEW_LINE_LATEX * (1 + question_json['rows'])
+            self.__print_question = self.__print_spaced_question_ret_randoms
             return
 
     def __extract_standard_question(self, question_json):
@@ -119,14 +126,20 @@ class Question:
     def is_optional(self):
         return self.__is_optional
 
-    def print_question_ret_randoms(self, enum, student_type):
+    def __print_no_space_question_ret_randoms(self, enum, student_type, appendix=''):
         [text, used_randoms] = self.__substitute_random_values_returning(self.__text, self.__random_handlers)
         to_print = '(' + str(self.__points) + \
                    (', facoltativa' if self.__is_optional and student_type == StudentType.OPTIONAL_QUESTIONS else '') \
-                   + ') ' + text
+                   + ') ' + text + appendix
         enum.add_item(NoEscape(to_print))
 
         return used_randoms
+
+    def __print_spaced_question_ret_randoms(self, enum, student_type):
+        return self.__print_no_space_question_ret_randoms(enum, student_type, self.__appendix)
+
+    def print_question_ret_randoms(self, enum, student_type):
+        return self.__print_question(enum, student_type)
 
 
 class RandomHandler:

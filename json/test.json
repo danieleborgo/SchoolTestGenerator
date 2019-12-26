@@ -90,10 +90,15 @@
                       "text": "Question 7:\nHere is possible doing this\nin a single\nstring."
                   },
                   {
+                      "type": "spaced_question",
+                      "text": "Question 8: This question has some space for answer.",
+                      "rows": 3
+                  },
+                  {
                       "type": "no_space_question",
                       "array": true,
                       "text": [
-                          "Question 8: \n",
+                          "Question 9: \n",
                           "This ",
                           "question ",
                           "is ",
@@ -113,7 +118,7 @@
                     "optional": true,
                     "array": true,
                     "text": [
-                        "Question 9: \n",
+                        "Question 10: \n",
                         "Hello, take some different values: %n, %n and %n."
                     ],
                     "values": [

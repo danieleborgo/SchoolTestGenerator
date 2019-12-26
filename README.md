@@ -105,7 +105,9 @@ questions. It is organized as an array of arguments, that represent
 a big section, where each of them contains a set of questions.
 
 An argument is composed by an **_argument_name_** and an array of
-**_questions_**. Each question has these parameters:
+**_questions_**. These lasts can be of a lot of types, according to
+what the apposite parameter specifies, consequently they may have
+different fields. These are all in common:
 
 - **_type_**: this defines the question category.
 - **_optional_** (optional): declare the question as optional for the
@@ -113,12 +115,17 @@ students who need less questions.
 - **_points_** (optional): define the value in points of the question
 and, if not specified, its value is one.
 
+#### The types **_no_space_question_** and types **_spaced_question_**
+
+These two types indicate simple open questions where the student has to
+write the answer. The only difference between these two is that the 
+second provide an additional space under the question, while the first
+not. These two have in common these fields:
+
 - **_text_**: this contains the question in form of string or in form
 of strings array if the flag **_array_** is set to true. It can contain
 several **_%n_** that will be substituted with a random value chosen
 according to the rules of the following point.
-- **_array_** (optional): if set and true it defines the field
-**_text_** as an array of string the program will concatenate.
 - **_values_**: this field, optional if the **_text_** doesn't contain
 any **_%n_**, specifies the policies to follow for the value to 
 substitute. For each token in the **_text_** it is necessary specify 
@@ -130,3 +137,36 @@ one policy. There are three policies, stored in the parameter
     [**_min_**, **_max_**] with the specified number of **_digits_**;
     - **_set_**: this specifies the value is picked randomly in a set,
     stored in the field **_set_**.
+- **_array_** (optional): if set and true it defines the field
+**_text_** as an array of string the program will concatenate.
+    
+The type **_spaced_question_** requires an additional field named 
+**_row_** where it's necessary specify an integer number of rows to
+leave for the answer.
+
+## How to add standard stuff
+
+### Adding a new question type
+
+The first thing to do is to add it in the **_QuestionType_** enum in
+[enums.py](./generator/enums.py), then explain to the program how to
+parse it. Consequently, in the class **_Question_** in
+[Argument.py](./generator/Argument.py), the constructor offers a simple
+way to add it, using its if structure. In the if code it's possible 
+parsing new JSON fields but it's mandatory to set the field
+**_\_\_print_question_** with a method takes as parameters an enum and
+a student's type that prints in the enum the question. The second
+parameter can be used if it's necessary differentiate the question
+according to the student's type. It's important remember to specify the
+points value and if the question is mandatory or less in the generation.
+The two already implemented question can be an example.
+
+### Adding a new student type
+
+After adding it in **_StudentType_** in 
+[enums.py](./generator/enums.py), the next step strictly depends on 
+which is the effect of this new category. All the questions, before
+being generated, receive the student's type as parameter and this can be
+exploited to generate different version of the question, like it happens
+for the students that need optional question. Some functions, like the
+one that generates the rules, receive the student's type as parameter.

@@ -11,7 +11,7 @@ belongs, in order to specify his or her needs in the test. According
 to students needs, this software supports people who need more time,
 who need optional questions or who need the permission to use notes.
 - **_QuestionType_**: useful to define the category of the questions.
-Actually, only simple questions are supported, but can be easily
+Actually, two simple questions are supported, but can be easily
 extended to support more.
 
 ## [generator.py](./generator.py)
@@ -32,7 +32,7 @@ format test is requested. It's named **_parse_student_**.
 
 ## [Student.py](./Student.py)
 
-This file contains a class supposed to represent a single student.
+This file contains a class representing a single student.
 It is composed by a name, by a surname, by a register number and by
 a type (_StudentType_). 
 
