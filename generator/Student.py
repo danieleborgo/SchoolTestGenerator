@@ -3,8 +3,11 @@ from generator.enums import StudentType
 
 class Student:
     """
-        This class represents a single student with all the
-        related information.
+        This class represents a single student through these:
+        - A register number
+        - A name
+        - A surname
+        - A type for describe students needs
     """
     def __init__(self, register_number, name, surname, student_type):
         self.__register_number = register_number
@@ -31,17 +34,24 @@ class Student:
 def translate_students(students_json):
     """
         This function translates an array of JSON students in an array
-        of instances of ste Student object
+        of instances of Student, properly filled with data.
     """
     students = []
 
     for i in range(len(students_json)):
-        student_type = StudentType.STANDARD
+
         if 'type' in students_json[i]:
             student_type = StudentType.translate_type(students_json[i]['type'])
+        else:
+            student_type = StudentType.STANDARD
 
         students.append(
-            Student(i+1, students_json[i]['name'], students_json[i]['surname'], student_type)
+            Student(
+                register_number=i+1,
+                name=students_json[i]['name'],
+                surname=students_json[i]['surname'],
+                student_type=student_type
+            )
         )
 
     return students

@@ -7,6 +7,14 @@ from generator.enums import StudentType
 
 
 def generate_tests(students_file_name, test_file_name):
+    """
+        This is the function that generates all the test, with the due differences.
+        It imports the two JSON files, passed as parameters, and creates the array
+        of students and the Test instance. Then it sets some general parameter in
+        the LaTex document, generates all the tests, creates the final PDF and, in
+        the end, if necessary, creates a file containing all the used random values.
+    """
+
     try:
         students_file = open(students_file_name)
     except IOError:
@@ -45,6 +53,21 @@ def generate_tests(students_file_name, test_file_name):
 
 
 def parse_student(doc, student, test, used_randoms_bucket):
+    """
+        This function generates a test for the passed student in the given document.
+        It prints these things:
+        - Header and footer
+        - The two initial images
+        - The student's name and surname
+        - The title
+        - The rules
+        - The votes table
+        - The earned points table
+        - The result space
+        - The questions
+        It also returns the used random values, in order to allow the caller to collect them.
+    """
+
     reset_page_counter(doc)
     reset_section_counter(doc)  # Useless but useful for extensions
 
@@ -95,7 +118,7 @@ def parse_student(doc, student, test, used_randoms_bucket):
     used_randoms = print_questions_returning_randoms(
         doc=doc,
         arguments=test.get_arguments(),
-        optional_en=student.do_you_want_optional()
+        student_type=student.get_student_type()
     )
     used_randoms.insert(0, student.get_surname())
     used_randoms_bucket.append(used_randoms)
@@ -180,7 +203,7 @@ def print_earned_points_table(doc, points_data):
         eval_table.add_row(['Voto: ', '__________'])
 
 
-def print_questions_returning_randoms(doc, arguments, optional_en):
+def print_questions_returning_randoms(doc, arguments, student_type):
     first = True
     used_randoms = []
     doc.append("Tra parentesi sono indicati i punteggi assegnabili per ogni domanda.")
@@ -195,15 +218,7 @@ def print_questions_returning_randoms(doc, arguments, optional_en):
             else:
                 options = 'resume'
             with doc.create(Enumerate(options=options)) as enum:
-                used_randoms += print_question_returning_randoms(enum, question, optional_en)
-    return used_randoms
-
-
-def print_question_returning_randoms(enum, question, optional_en):
-    [text, used_randoms] = question.get_text_filled()
-    to_print = '(' + str(question.get_points()) + \
-               (', facoltativa' if optional_en and question.is_optional() else '') + ') ' + text
-    enum.add_item(NoEscape(to_print))
+                used_randoms += question.print_question_ret_randoms(enum, student_type)
     return used_randoms
 
 

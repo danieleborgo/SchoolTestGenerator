@@ -7,8 +7,13 @@ from generator.test_support import PointsData, VotesData
 
 class Test:
     """
-        This class is supposed to optimize the file generation, reducing the
-        amount of computation avoiding to calculate same things.
+        This is the most important class of the generator and it's responsible for optimizing
+        the generation of the test, integrating the JSON file with some further information.
+        Its first operations are supposed to extract simple data from the JSON, like subject,
+        subtitle, language and so on. Then it extracts all the arguments and their relative
+        questions, storing them in apposite object. In the end, it creates an instance of
+        VotesData and one of PointsData, in order to optimize the generation of these two
+        tables.
     """
 
     def __init__(self, test_json):
@@ -41,7 +46,7 @@ class Test:
             total_points=total_points,
             number_of_questions=self.__number_of_questions,
             is_extra_enabled=self.__extra_point_en,
-            extra_params=test_json['extra_params'] if 'extra_params' in test_json else [],
+            additional_params=test_json['extra_params'] if 'extra_params' in test_json else [],
         )
 
     def __extract_arguments(self, arguments_json):

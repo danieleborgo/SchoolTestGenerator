@@ -108,10 +108,17 @@ An argument is composed by an **_argument_name_** and an array of
 **_questions_**. Each question has these parameters:
 
 - **_type_**: this defines the question category.
+- **_optional_** (optional): declare the question as optional for the
+students who need less questions.
+- **_points_** (optional): define the value in points of the question
+and, if not specified, its value is one.
+
 - **_text_**: this contains the question in form of string or in form
 of strings array if the flag **_array_** is set to true. It can contain
 several **_%n_** that will be substituted with a random value chosen
 according to the rules of the following point.
+- **_array_** (optional): if set and true it defines the field
+**_text_** as an array of string the program will concatenate.
 - **_values_**: this field, optional if the **_text_** doesn't contain
 any **_%n_**, specifies the policies to follow for the value to 
 substitute. For each token in the **_text_** it is necessary specify 
@@ -123,9 +130,3 @@ one policy. There are three policies, stored in the parameter
     [**_min_**, **_max_**] with the specified number of **_digits_**;
     - **_set_**: this specifies the value is picked randomly in a set,
     stored in the field **_set_**.
-- **_optional_** (optional): declare the question as optional for the
-students who need less questions.
-- **_points_** (optional): define the value in points of the question
-and, if not specified, its value is one.
-- **_array_** (optional): if set and true it defines the field
-**_text_** as an array of string the program will concatenate.

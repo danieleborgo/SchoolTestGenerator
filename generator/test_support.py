@@ -5,17 +5,25 @@ from generator.enums import StudentType
 
 class PointsData:
     """
-        This class is used to support the generation of the earned point table.
+        This class handle the data relative to points assignment, so the evaluation table
+        and the total amount of the test points.
+        This class creates a table useful to write earned points by a student
+        in function of the exercise number. It can contains also some additional field,
+        like an extra point for the order and others field defined in the apposite
+        parameter in the JSON file.
+        After having create the table, it can be injected several times in the document,
+        using the apposite public method.
     """
 
-    def __init__(self, total_points, number_of_questions, is_extra_enabled, extra_params):
+    def __init__(self, total_points, number_of_questions, is_extra_enabled, additional_params):
         self.__total_points = total_points
 
+        # Create the first row of the table
         questions_numbers = ['Extra'] if is_extra_enabled else []
-        questions_numbers += extra_params + list(range(1, number_of_questions + 1))
+        questions_numbers += additional_params + list(range(1, number_of_questions + 1))
 
-        table_string = '|c|' if is_extra_enabled else '|'
-        table_string += 'c|' * (len(extra_params) + number_of_questions)
+        # Create the table string
+        table_string = ('|c|' if is_extra_enabled else '|') + 'c|' * (len(additional_params) + number_of_questions)
 
         self.__create_table(table_string, questions_numbers)
 
@@ -36,7 +44,14 @@ class PointsData:
 
 class VotesData:
     """
-        This class supports the generation of the vote tables.
+        This class generates and handles the vote table, the one used to compute
+        the vote, given the total earned points. It gets data from the apposite
+        section in the JSON.
+        It generates actually two tables:
+        - The standard one, as specified in the JSON file;
+        - The one for the students who have optional questions.
+        With the apposite public method, it injects this table in the document,
+        since it is able to insert it several times.
     """
 
     def __init__(self, votes_json, optional_count):
@@ -45,6 +60,7 @@ class VotesData:
         max_vote = votes_json['max']['vote']
         max_required_points = votes_json['max']['from']
 
+        # The first is the table string, the second the row containing earned points and the third the grades
         string_st, points_st, votes_st = self.__create_earned_votes_array(max_vote, max_required_points,
                                                                           min_vote, min_required_points)
         string_wo, points_wo, votes_wo = self.__create_earned_votes_array(max_vote, max_required_points-optional_count,
@@ -87,9 +103,12 @@ class VotesData:
             doc.append(self.__standard_votes_table)
 
     class VoteConverter:
+        """
+            This class is used to convert a float value in the closest upper grade.
+        """
         __vote_table = ('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5',
                         '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10')
 
         @staticmethod
         def to_vote(n):
-            return VotesData.VoteConverter.__vote_table[ceil(n * 2) % 20]
+            return VotesData.VoteConverter.__vote_table[ceil(n * 2)]
