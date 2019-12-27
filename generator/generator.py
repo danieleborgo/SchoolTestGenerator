@@ -4,6 +4,7 @@ from pylatex.utils import bold
 from generator.Student import translate_students
 from generator.Test import Test
 from generator.enums import StudentType
+import generator.sentences as sentences
 
 
 def generate_tests(students_file_name, test_file_name):
@@ -93,7 +94,7 @@ def parse_student(doc, student, test, used_randoms_bucket):
         subtitle=test.get_subtitle()
     )
 
-    doc.append(Command('section*', 'Regolamento'))
+    doc.append(Command('section*', sentences.SECTIONS.REGULATION))
     print_rules(
         doc=doc,
         duration=test.get_duration(student.get_student_type()),
@@ -101,7 +102,7 @@ def parse_student(doc, student, test, used_randoms_bucket):
         is_extra_enabled=test.is_extra_enabled()
     )
 
-    doc.append(Command('section*', 'Valutazione'))
+    doc.append(Command('section*', sentences.SECTIONS.EVALUATION))
     print_evaluation_rule_exercise(doc)
     print_points_to_vote_table(
         doc=doc,
@@ -140,17 +141,17 @@ def print_figures(doc):
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as left_figure:
-            left_figure.add_image('./img/logo.png')
+            left_figure.add_image('./images/logo.png')
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as right_figure:
-            right_figure.add_image('./img/pon.png')
+            right_figure.add_image('./images/pon.png')
 
 
 def print_student_name(doc, name, surname):
     with doc.create(LongTable('l l', col_space='0.6cm', row_height=2.0)) as name_table:
-        name_table.add_row(['Cognome', bold(surname.upper())])
-        name_table.add_row(['Nome', bold(name.upper())])
+        name_table.add_row([sentences.NAMING.SURNAME, bold(surname.upper())])
+        name_table.add_row([sentences.NAMING.NAME, bold(name.upper())])
 
 
 def print_title(doc, subject, subtitle):
@@ -164,29 +165,26 @@ def print_title(doc, subject, subtitle):
 
 def print_rules(doc, duration, student_type, is_extra_enabled):
     with doc.create(Itemize()) as itemize:
-        itemize.add_item("Il tempo a disposizione è di " + str(duration) + " minuti.")
-        itemize.add_item("Non è permesso l'uso di dispositivi elettronici al di fuori della calcolatrice.")
-        itemize.add_item("Non è permesso parlare o alzarsi durante la verifica.")
+        itemize.add_item(sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX)
+        itemize.add_item(sentences.RULES.NO_SMART_PHONES)
+        itemize.add_item(sentences.RULES.NO_STAND_UP)
 
         if student_type != StudentType.ALLOW_NOTES:
-            itemize.add_item("Non è permesso l'uso degli appunti o del libro.")
+            itemize.add_item(sentences.RULES.NO_NOTES)
         else:
-            itemize.add_item("Lo studente è autorizzato ad usare i suoi appunti ma non il libro.")
+            itemize.add_item(sentences.RULES.YES_NOTES)
 
         if is_extra_enabled:
-            itemize.add_item("Un punto extra verrà attribuito qualora si rispettino tutte le regole " +
-                             "qui elencate e se si consegnerà un compito ordinato.")
+            itemize.add_item(sentences.RULES.EXTRA_POINT)
 
 
 def print_evaluation_rule_exercise(doc):
-    doc.append('Tabella di valutazione degli esercizi:')
+    doc.append(sentences.EVALUATION.TABLE_CAPTION + ':')
     with doc.create(LongTable(NoEscape('p{0.05\\textwidth}|p{0.81\\textwidth}'), row_height=1.5)) as ex_table:
-        ex_table.add_row([bold('100%'), 'Lo svolgimento è completo e corretto, con linguaggio pertinente.'])
-        ex_table.add_row([bold('75%'), 'Lo svolgimento è incompleto, lievemente errato o con linguaggio impreciso.'])
-        ex_table.add_row([bold('50%'), 'Lo svolgimento è incompleto, superficiale, ' +
-                          'con errori diffusi o con linguaggio incerto.'])
-        ex_table.add_row([bold('25%'), 'Lo svolgimento manca di molte parti, presenta errori gravi ' +
-                          'o con linguaggio molto insicuro.'])
+        ex_table.add_row([bold('100%'), sentences.EVALUATION.P100])
+        ex_table.add_row([bold('75%'), sentences.EVALUATION.P75])
+        ex_table.add_row([bold('50%'), sentences.EVALUATION.P50])
+        ex_table.add_row([bold('25%'), sentences.EVALUATION.P25])
 
 
 def print_points_to_vote_table(doc, votes_data, student_type):
@@ -199,14 +197,16 @@ def print_earned_points_table(doc, points_data):
     doc.append(Command('vspace', NoEscape('-1em')))
 
     with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
-        eval_table.add_row(['Punteggio (' + str(points_data.get_total_points()) + '): ', '__________'])
-        eval_table.add_row(['Voto: ', '__________'])
+        eval_table.add_row(
+            [sentences.EVALUATION.GAINED_POINTS + ' (' + str(points_data.get_total_points()) + '): ', '__________']
+        )
+        eval_table.add_row([sentences.EVALUATION.GRADE + ': ', '__________'])
 
 
 def print_questions_returning_randoms(doc, arguments, student_type):
     first = True
     used_randoms = []
-    doc.append("Tra parentesi sono indicati i punteggi assegnabili per ogni domanda.")
+    doc.append(sentences.EVALUATION.BEFORE_EX_NOTE)
 
     for argument in arguments:
         doc.append(Command('section*', argument.get_name()))

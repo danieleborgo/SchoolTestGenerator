@@ -1,6 +1,7 @@
 from math import ceil
 from pylatex import LongTable, NoEscape
 from generator.enums import StudentType
+import generator.sentences as sentences
 
 
 class PointsData:
@@ -19,7 +20,7 @@ class PointsData:
         self.__total_points = total_points
 
         # Create the first row of the table
-        questions_numbers = ['Extra'] if is_extra_enabled else []
+        questions_numbers = [sentences.OTHERS.EXTRA] if is_extra_enabled else []
         questions_numbers += additional_params + list(range(1, number_of_questions + 1))
 
         # Create the table string
@@ -72,13 +73,13 @@ class VotesData:
     def __create_earned_votes_array(self, max_vote, max_required_points, min_vote, min_required_points):
         table_string = '|c|c|c|' + 'c|' * (max_required_points - min_required_points - 1)
 
-        points_row = ['Punti', NoEscape('$ \\leq ' + str(min_required_points) + ' $')]
+        points_row = [sentences.OTHERS.POINTS, NoEscape('$ \\leq ' + str(min_required_points) + ' $')]
         points_row += list(range(min_required_points + 1, max_required_points))
         points_row.append(NoEscape('$ ' + '\\geq ' + str(max_required_points) + ' $'))
 
         vote_step = (max_vote - min_vote) / (max_required_points - min_required_points)
         vote_acc = float(min_vote)
-        votes_row = ['Voto', min_vote]
+        votes_row = [sentences.EVALUATION.GRADE, min_vote]
         for i in range(min_required_points + 1, max_required_points):
             vote_acc += vote_step
             votes_row.append(self.VoteConverter.to_vote(vote_acc))

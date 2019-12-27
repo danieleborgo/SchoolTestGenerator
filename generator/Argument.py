@@ -1,6 +1,7 @@
 from random import randint, uniform, choice
 from pylatex import NoEscape
 from generator.enums import QuestionType, StudentType
+import generator.sentences as sentences
 
 # This is the token that will represent a random value in the JSON text representation
 RANDOM_NUMBER_TOKEN = '%n'
@@ -129,7 +130,8 @@ class Question:
     def __print_no_space_question_ret_randoms(self, enum, student_type, appendix=''):
         [text, used_randoms] = self.__substitute_random_values_returning(self.__text, self.__random_handlers)
         to_print = '(' + str(self.__points) + \
-                   (', facoltativa' if self.__is_optional and student_type == StudentType.OPTIONAL_QUESTIONS else '') \
+                   (', ' + sentences.OTHERS.OPTIONAL
+                    if self.__is_optional and student_type == StudentType.OPTIONAL_QUESTIONS else '') \
                    + ') ' + text + appendix
         enum.add_item(NoEscape(to_print))
 

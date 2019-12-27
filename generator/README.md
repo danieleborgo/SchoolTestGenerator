@@ -59,3 +59,9 @@ through **_RandomHandler_**.
 
 The classes **_PointsData_** and **_VotesData_** optimize their
 table generation.
+
+## [Sentences.py](sentences.py)
+
+This file is used to import strings in different languages. It contains
+several constants, grouped in objects, that are filled at runtime
+extracting them from the passed properties file.

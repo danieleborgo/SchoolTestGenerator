@@ -3,6 +3,7 @@ from warnings import warn
 from generator.enums import StudentType
 from generator.Argument import Argument
 from generator.test_support import PointsData, VotesData
+import generator.sentences as sentences
 
 
 class Test:
@@ -23,13 +24,15 @@ class Test:
     def __extract_parameters(self, test_json):
         self.__subject = test_json['subject']
         self.__subtitle = test_json['subtitle']
-        self.__language = test_json['language']
+        self.__language = test_json['language'].capitalize()
         self.__class = test_json['class']
         self.__years = test_json['years']
         self.__date = test_json['date']
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
         self.__project_en = test_json['project'] if 'project' in test_json else False
+
+        sentences.import_sentences(self.__language)
 
         if 'more_time_duration' in test_json:
             self.__more_time_duration = test_json['more_time_duration']
