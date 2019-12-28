@@ -39,7 +39,8 @@ change if some basic data of the test is modified.
     
     7.5. [Adding a new sentence](#75-adding-a-new-sentence)
     
-8. [License](#8-license)
+8. [Author](#8-author)
+9. [License](#9-license)
 
 ## 1. Required installed software
 
@@ -251,7 +252,11 @@ as the other ones. The only drawback is that, after having added a new
 sentence to the Python file, the program will require it for all the
 languages.
 
-## 8. License
+## 8. Author
+
+This software was developed by Borgo Daniele in 2019.
+
+## 9. License
 
 This software is distributed on GPLv3.0, more information available
 in [LICENSE.md](./LICENSE.md).
