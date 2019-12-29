@@ -116,7 +116,8 @@ def parse_student(doc, student, test, used_randoms_bucket):
         doc=doc,
         duration=test.get_duration(student.get_student_type()),
         student_type=student.get_student_type(),
-        is_extra_enabled=test.is_extra_enabled()
+        is_extra_enabled=test.is_extra_enabled(),
+        is_open_book=test.is_open_book()
     )
 
     doc.append(Command('section*', sentences.SECTIONS.EVALUATION))
@@ -180,16 +181,19 @@ def print_title(doc, subject, subtitle):
         center.append(subtitle)
 
 
-def print_rules(doc, duration, student_type, is_extra_enabled):
+def print_rules(doc, duration, student_type, is_extra_enabled, is_open_book):
     with doc.create(Itemize()) as itemize:
         itemize.add_item(sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX)
         itemize.add_item(sentences.RULES.NO_SMART_PHONES)
         itemize.add_item(sentences.RULES.NO_STAND_UP)
 
-        if student_type != StudentType.ALLOW_NOTES:
-            itemize.add_item(sentences.RULES.NO_NOTES)
+        if is_open_book:
+            itemize.add_item(sentences.RULES.OPEN_BOOK)
         else:
-            itemize.add_item(sentences.RULES.YES_NOTES)
+            if student_type != StudentType.ALLOW_NOTES:
+                itemize.add_item(sentences.RULES.NO_NOTES)
+            else:
+                itemize.add_item(sentences.RULES.YES_NOTES)
 
         if is_extra_enabled:
             itemize.add_item(sentences.RULES.EXTRA_POINT)

@@ -128,6 +128,8 @@ not specified.
 - **_extra_point_** (optional, _boolean_): if set and true, it enables
 the  generation of an extra point for answers graphical order and for
 the rules respect;
+- **_open_book_** (optional, _boolean_): if set and true, the software
+prints the rule allows the use of notes and books;
 - **_extra_params_** (optional, _array_): this field contains an array
 of strings, representing some external things to evaluate for giving
 the grade, like homework or projects.

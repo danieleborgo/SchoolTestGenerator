@@ -47,7 +47,7 @@ class Test:
         self.__date = test_json['date']
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
-        self.__project_en = test_json['project'] if 'project' in test_json else False
+        self.__is_open_book = test_json['open_book'] if 'open_book' in test_json else False
 
         sentences.import_sentences(self.__language)
 
@@ -128,6 +128,9 @@ class Test:
 
     def is_extra_enabled(self):
         return self.__extra_point_en
+
+    def is_open_book(self):
+        return self.__is_open_book
 
     def get_bucket_name(self):
         return 'used_randoms_bucket_' + self.__class + '.txt'

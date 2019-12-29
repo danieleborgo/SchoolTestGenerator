@@ -8,6 +8,7 @@
     "duration": 60,
     "more_time_duration": 70,
     "extra_point": true,
+    "open_book": false,
     "extra_params": [
         "Project"
     ],

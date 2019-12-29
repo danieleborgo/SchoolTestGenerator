@@ -64,6 +64,7 @@ class Rules:
         self.TIME_POSTFIX = parser.get('Rules', 'time_postfix')
         self.NO_SMART_PHONES = parser.get('Rules', 'no_smart_phones')
         self.NO_STAND_UP = parser.get('Rules', 'no_stand_up')
+        self.OPEN_BOOK = parser.get('Rules', 'open_book')
         self.NO_NOTES = parser.get('Rules', 'no_notes')
         self.YES_NOTES = parser.get('Rules', 'yes_notes')
         self.EXTRA_POINT = parser.get('Rules', 'extra_point')
