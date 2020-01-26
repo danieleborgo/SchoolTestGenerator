@@ -1,4 +1,4 @@
-# Test Generator
+# School Test Generator
 
 <img width="" src="images/student.png" alt="" align="right"> 
 This software is able to generate several school tests, all different
@@ -38,6 +38,8 @@ change if some basic data of the test is modified.
     7.4. [Adding a new language](#74-adding-a-new-language)
     
     7.5. [Adding a new sentence](#75-adding-a-new-sentence)
+    
+    7.6. [Adding new test rules](#76-adding-new-test-rules)
     
 8. [Author](#8-author)
 9. [License](#9-license)
@@ -254,9 +256,15 @@ as the other ones. The only drawback is that, after having added a new
 sentence to the Python file, the program will require it for all the
 languages.
 
+### 7.6 Adding new test rules
+
+In the _properties_ file, it's possible add new rules in the section
+named _*UserRules*_. Their names are ignored by the program, they
+only need to be disjoint.
+
 ## 8. Author
 
-This software was developed by Borgo Daniele in 2019.
+This software was developed by Borgo Daniele in 2019 and 2020.
 
 ## 9. License
 

@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2019  Borgo Daniele
+    Copyright (C) 2020  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -159,11 +159,11 @@ def print_figures(doc):
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as left_figure:
-            left_figure.add_image('./images/logo.png')
+            left_figure.add_image('./images/school_logo.png')
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as right_figure:
-            right_figure.add_image('./images/pon.png')
+            right_figure.add_image('./images/school_data.png')
 
 
 def print_student_name(doc, name, surname):
@@ -184,8 +184,9 @@ def print_title(doc, subject, subtitle):
 def print_rules(doc, duration, student_type, is_extra_enabled, is_open_book):
     with doc.create(Itemize()) as itemize:
         itemize.add_item(sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX)
-        itemize.add_item(sentences.RULES.NO_SMART_PHONES)
-        itemize.add_item(sentences.RULES.NO_STAND_UP)
+
+        for rule in sentences.RULES.USER_RULES:
+            itemize.add_item(rule)
 
         if is_open_book:
             itemize.add_item(sentences.RULES.OPEN_BOOK)

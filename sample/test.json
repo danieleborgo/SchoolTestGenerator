@@ -52,7 +52,10 @@
                             "set": [
                                 "one",
                                 "two",
-                                "three"
+                                "three",
+                                "four",
+                                "five",
+                                "six"
                             ]
                         }
                     ]

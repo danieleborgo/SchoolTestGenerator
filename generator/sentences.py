@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2019  Borgo Daniele
+    Copyright (C) 2020  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ def import_sentences(language):
     parser.read(generate_file_name(language))
 
     global SECTIONS, NAMING, RULES, EVALUATION, OTHERS
-    SECTIONS = Sections(parser)
-    NAMING = Naming(parser)
-    RULES = Rules(parser)
-    EVALUATION = Evaluation(parser)
-    OTHERS = Others(parser)
+    SECTIONS = Sections(parser['Sections'])
+    NAMING = Naming(parser['Naming'])
+    RULES = Rules(parser['GeneralRules'], parser['UserRules'])
+    EVALUATION = Evaluation(parser['Evaluation'])
+    OTHERS = Others(parser['Others'])
 
 
 def generate_file_name(language):
@@ -47,43 +47,46 @@ def generate_file_name(language):
 
 
 class Sections:
-    def __init__(self, parser):
-        self.REGULATION = parser.get('Sections', 'regulation').capitalize()
-        self.EVALUATION = parser.get('Sections', 'evaluation').capitalize()
+    def __init__(self, parser_sections):
+        self.REGULATION = parser_sections['regulation'].capitalize()
+        self.EVALUATION = parser_sections['evaluation'].capitalize()
 
 
 class Naming:
-    def __init__(self, parser):
-        self.NAME = parser.get('Naming', 'name').capitalize()
-        self.SURNAME = parser.get('Naming', 'surname').capitalize()
+    def __init__(self, parser_naming):
+        self.NAME = parser_naming['name'].capitalize()
+        self.SURNAME = parser_naming['surname'].capitalize()
 
 
 class Rules:
-    def __init__(self, parser):
-        self.TIME_PREFIX = parser.get('Rules', 'time_prefix')
-        self.TIME_POSTFIX = parser.get('Rules', 'time_postfix')
-        self.NO_SMART_PHONES = parser.get('Rules', 'no_smart_phones')
-        self.NO_STAND_UP = parser.get('Rules', 'no_stand_up')
-        self.OPEN_BOOK = parser.get('Rules', 'open_book')
-        self.NO_NOTES = parser.get('Rules', 'no_notes')
-        self.YES_NOTES = parser.get('Rules', 'yes_notes')
-        self.EXTRA_POINT = parser.get('Rules', 'extra_point')
+    def __init__(self, parser_gen_rules, parser_us_rules):
+        self.TIME_PREFIX = parser_gen_rules['time_prefix']
+        self.TIME_POSTFIX = parser_gen_rules['time_postfix']
+        self.OPEN_BOOK = parser_gen_rules['open_book']
+        self.NO_NOTES = parser_gen_rules['no_notes']
+        self.YES_NOTES = parser_gen_rules['yes_notes']
+        self.EXTRA_POINT = parser_gen_rules['extra_point']
+
+        self.USER_RULES = []
+        for key in parser_us_rules:
+            self.USER_RULES.append(parser_us_rules[key])
+        self.USER_RULES = tuple(self.USER_RULES)
 
 
 class Evaluation:
-    def __init__(self, parser):
-        self.TABLE_CAPTION = parser.get('Evaluation', 'table_caption')
-        self.P100 = parser.get('Evaluation', '100%')
-        self.P75 = parser.get('Evaluation', '75%')
-        self.P50 = parser.get('Evaluation', '50%')
-        self.P25 = parser.get('Evaluation', '25%')
-        self.GAINED_POINTS = parser.get('Evaluation', 'gained_points').capitalize()
-        self.GRADE = parser.get('Evaluation', 'grade').capitalize()
-        self.BEFORE_EX_NOTE = parser.get('Evaluation', 'before_ex_note')
+    def __init__(self, parser_evaluation):
+        self.TABLE_CAPTION = parser_evaluation['table_caption']
+        self.P100 = parser_evaluation['100%']
+        self.P75 = parser_evaluation['75%']
+        self.P50 = parser_evaluation['50%']
+        self.P25 = parser_evaluation['25%']
+        self.GAINED_POINTS = parser_evaluation['gained_points'].capitalize()
+        self.GRADE = parser_evaluation['grade'].capitalize()
+        self.BEFORE_EX_NOTE = parser_evaluation['before_ex_note']
 
 
 class Others:
-    def __init__(self, parser):
-        self.OPTIONAL = parser.get('Others', 'optional_question')
-        self.EXTRA = parser.get('Others', 'extra').capitalize()
-        self.POINTS = parser.get('Others', 'points').capitalize()
+    def __init__(self, parser_others):
+        self.OPTIONAL = parser_others['optional_question']
+        self.EXTRA = parser_others['extra'].capitalize()
+        self.POINTS = parser_others['points'].capitalize()
