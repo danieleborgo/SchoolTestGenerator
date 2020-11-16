@@ -20,6 +20,7 @@ from warnings import warn
 from generator.enums import StudentType
 from generator.Argument import Argument
 from generator.test_support import PointsData, VotesData
+from os import mkdir, path
 import generator.sentences as sentences
 
 
@@ -48,6 +49,12 @@ class Test:
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
         self.__is_open_book = test_json['open_book'] if 'open_book' in test_json else False
+        self.__single_files = test_json['single_files'] if 'single_files' in test_json else False
+
+        self.__out_folder = test_json['out_folder'] + '/' if 'out_folder' in test_json else None
+        if self.__out_folder is not None:
+            if not path.isdir(self.__out_folder):
+                mkdir(self.__out_folder)
 
         sentences.import_sentences(self.__language)
 
@@ -131,6 +138,12 @@ class Test:
 
     def is_open_book(self):
         return self.__is_open_book
+
+    def is_single_files(self):
+        return self.__single_files
+
+    def get_out_path(self):
+        return self.__out_folder if self.__out_folder is not None else ''
 
     def get_bucket_name(self):
         return 'used_randoms_bucket_' + self.__class + '.txt'

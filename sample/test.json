@@ -9,6 +9,8 @@
     "more_time_duration": 70,
     "extra_point": true,
     "open_book": false,
+    "single_files": false,
+    "out_folder": "sample",
     "extra_params": [
         "Project"
     ],
@@ -68,6 +70,8 @@
         },
         {
             "argument_name": "Different points and optionality",
+            "argument_text": "This is a text for this argument. These questions are also shuffled.",
+            "shuffle": true,
             "questions": [
                 {
                     "type": "no_space_question",

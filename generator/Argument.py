@@ -17,6 +17,7 @@
 
 from random import randint, uniform, choice
 from pylatex import NoEscape
+from random import shuffle
 from generator.enums import QuestionType, StudentType
 import generator.sentences as sentences
 
@@ -41,6 +42,12 @@ class Argument:
         self.__questions = []
         self.__total_points = 0
         self.__optionals_points = 0
+        self.__shuffle = argument_json['shuffle'] if 'shuffle' in argument_json else False
+
+        if 'argument_text' in argument_json:
+            self.__argument_text = argument_json['argument_text'].replace(NEW_LINE_TOKEN, NEW_LINE_LATEX)
+        else:
+            self.__argument_text = None
 
         # Import questions and computes the argument points and the number of optional questions
         for i in range(len(argument_json['questions'])):
@@ -53,11 +60,22 @@ class Argument:
     def get_name(self):
         return self.__name
 
+    def do_you_have_arg_text(self):
+        return self.__argument_text is not None
+
+    def get_argument_text(self):
+        return self.__argument_text
+
     def get_number_of_questions(self):
         return len(self.__questions)
 
     def get_questions(self):
-        return self.__questions
+        if not self.__shuffle:
+            return self.__questions
+
+        to_return = list(self.__questions)
+        shuffle(to_return)
+        return tuple(to_return)
 
     def get_points(self):
         return self.__total_points

@@ -18,10 +18,12 @@
 import sys
 from generator.generator import generate_tests
 
+NUM_OF_PARAMS = 2
+
 if __name__ == '__main__':
     print("SCHOOL TEST GENERATOR\nCopyright (C) 2020  Borgo Daniele\n")
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < NUM_OF_PARAMS + 1:
         raise Exception("Two parameters are requested")
     else:
         generate_tests(

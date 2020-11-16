@@ -49,25 +49,49 @@ def generate_tests(students_file_name, test_file_name):
     test_file.close()
     del test_file
 
+    if not test.is_single_files():
+        doc = generate_doc_file(test.get_language().lower())
+    else:
+        doc = None
+
+    used_randoms_bucket = []
+    for student in students:
+        if test.is_single_files():
+            doc = generate_doc_file(test.get_language().lower())
+
+        parse_student(doc, student, test, used_randoms_bucket)
+
+        if test.is_single_files():
+            doc.generate_pdf(
+                test.get_out_path() + (student.get_surname() + '_' + student.get_name()).replace(' ', '_'),
+                clean_tex=True
+            )
+
+    print("Generated " + str(len(students)) + " tests")
+
+    if not test.is_single_files():
+        doc.generate_pdf(test.get_out_path() + test.get_output_file_name(), clean_tex=False)
+    print("Generated the PDF file")
+
+    if generate_used_randoms_file_if_necessary(
+            used_randoms_bucket, test.get_out_path() + test.get_bucket_name()):
+        print("Generated random values used file")
+
+
+def generate_doc_file(language):
+    """
+        This function prepares a LaTeX file for containing all the information.
+        These are general settings that can be specified once.
+    """
     doc = Document(documentclass='article')
     doc.packages.append(Package('fancyhdr'))
-    doc.packages.append(Package('babel', test.get_language().lower()))
+    doc.packages.append(Package('babel', language))
     doc.packages.append(Package('titlesec'))
     doc.preamble.append(Command('titlelabel', NoEscape('\\thetitle\\enspace')))
     doc.append(Command('fontsize', arguments=['9', '9']))
     doc.packages.append(Package('geometry', 'top=2.5cm, left=3cm, right=3cm, bottom=2cm'))
     doc.packages.append(Package('enumitem'))
-
-    used_randoms_bucket = []
-    for student in students:
-        parse_student(doc, student, test, used_randoms_bucket)
-    print("Generated " + str(len(students)) + " tests")
-
-    doc.generate_pdf(test.get_output_file_name(), clean_tex=False)
-    print("Generated the PDF file")
-
-    if generate_used_randoms_file_if_necessary(used_randoms_bucket, test.get_bucket_name()):
-        print("Generated random values used file")
+    return doc
 
 
 def parse_student(doc, student, test, used_randoms_bucket):
@@ -159,11 +183,11 @@ def print_figures(doc):
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as left_figure:
-            left_figure.add_image('./images/school_logo.png')
+            left_figure.add_image('../images/school_logo.png')
         with doc.create(SubFigure(
                 position='b',
                 width=NoEscape(r'0.5\linewidth'))) as right_figure:
-            right_figure.add_image('./images/school_data.png')
+            right_figure.add_image('../images/school_data.png')
 
 
 def print_student_name(doc, name, surname):
@@ -183,7 +207,9 @@ def print_title(doc, subject, subtitle):
 
 def print_rules(doc, duration, student_type, is_extra_enabled, is_open_book):
     with doc.create(Itemize()) as itemize:
-        itemize.add_item(sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX)
+        itemize.add_item(
+            sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX
+        )
 
         for rule in sentences.RULES.USER_RULES:
             itemize.add_item(rule)
@@ -220,7 +246,8 @@ def print_earned_points_table(doc, points_data):
 
     with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
         eval_table.add_row(
-            [sentences.EVALUATION.GAINED_POINTS + ' (' + str(points_data.get_total_points()) + '): ', '__________']
+            [sentences.EVALUATION.GAINED_POINTS +
+             ' (' + str(points_data.get_total_points()) + '): ', '__________']
         )
         eval_table.add_row([sentences.EVALUATION.GRADE + ': ', '__________'])
 
@@ -232,6 +259,8 @@ def print_questions_returning_randoms(doc, arguments, student_type):
 
     for argument in arguments:
         doc.append(Command('section*', argument.get_name()))
+        if argument.do_you_have_arg_text():
+            doc.append(NoEscape(argument.get_argument_text()))
 
         for question in argument.get_questions():
             if first:

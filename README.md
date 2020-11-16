@@ -132,6 +132,11 @@ the  generation of an extra point for answers graphical order and for
 the rules respect;
 - **_open_book_** (optional, _boolean_): if set and true, the software
 prints the rule allows the use of notes and books;
+- **_single_files_** (optional, _boolean_): if this is set true, the
+program generates one PDF for each student instead of a single file
+containing all the tests;
+- **_out_folder_**: (optional, _string_) this is the directory where
+all the files have to be placed and, if not set, it uses the actual one;
 - **_extra_params_** (optional, _array_): this field contains an array
 of strings, representing some external things to evaluate for giving
 the grade, like homework or projects.
@@ -156,7 +161,7 @@ This is the section that contains the real test and all its questions.
 It is organized as an array of arguments, which represent a big
 section, where each of them contains a set of questions.
 
-An argument is composed by an **_argument_name_** and an array of
+An argument is composed byan **_argument_name_** and an array of
 **_questions_**. These lasts can be of a lot of types, according to
 what the apposite parameter specifies, consequently they may have
 different fields. These are the ones in common:
@@ -166,6 +171,11 @@ different fields. These are the ones in common:
 optional for the students who need less questions;
 - **_points_** (optional, _int_): define the value in points of the
 question and, if not specified, its value is one.
+
+If the argument has a description, this can be set through 
+**_argument_text_**. If it's necessary to shuffle the questions
+in an argument, the flag **_shufle_** has to be set to true. These
+fields are both optional.
 
 #### The types **_no_space_question_** and types **_spaced_question_**
 
