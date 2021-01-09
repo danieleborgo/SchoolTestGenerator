@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ from generator.generator import generate_tests
 NUM_OF_PARAMS = 2
 
 if __name__ == '__main__':
-    print("SCHOOL TEST GENERATOR\nCopyright (C) 2020  Borgo Daniele\n")
+    print("SCHOOL TEST GENERATOR\nCopyright (C) 2021  Borgo Daniele\n")
 
     if len(sys.argv) < NUM_OF_PARAMS + 1:
         raise Exception("Two parameters are requested")

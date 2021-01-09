@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 from random import randint, uniform, choice
 from pylatex import NoEscape
 from random import shuffle
-from generator.enums import QuestionType, StudentType
+from generator.enums import QuestionType, Modifier
 import generator.sentences as sentences
 
 # This is the token that will represent a random value in the JSON text representation
@@ -162,21 +162,21 @@ class Question:
     def is_optional(self):
         return self.__is_optional
 
-    def __print_no_space_question_ret_randoms(self, enum, student_type, appendix=''):
+    def __print_no_space_question_ret_randoms(self, enum, has_optional_questions, appendix=''):
         [text, used_randoms] = self.__substitute_random_values_returning(self.__text, self.__random_handlers)
         to_print = '(' + str(self.__points) + \
                    (', ' + sentences.OTHERS.OPTIONAL
-                    if self.__is_optional and student_type == StudentType.OPTIONAL_QUESTIONS else '') \
+                    if self.__is_optional and has_optional_questions else '') \
                    + ') ' + text + appendix
         enum.add_item(NoEscape(to_print))
 
         return used_randoms
 
-    def __print_spaced_question_ret_randoms(self, enum, student_type):
-        return self.__print_no_space_question_ret_randoms(enum, student_type, self.__appendix)
+    def __print_spaced_question_ret_randoms(self, enum, has_optional_questions):
+        return self.__print_no_space_question_ret_randoms(enum, has_optional_questions, self.__appendix)
 
-    def print_question_ret_randoms(self, enum, student_type):
-        return self.__print_question(enum, student_type)
+    def print_question_ret_randoms(self, enum, has_optional_questions):
+        return self.__print_question(enum, has_optional_questions)
 
 
 class RandomHandler:

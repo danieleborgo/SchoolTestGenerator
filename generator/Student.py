@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from generator.enums import StudentType
+from generator.enums import Modifier
 
 
 class Student:
@@ -26,11 +26,11 @@ class Student:
         - A surname
         - A type for describe students needs
     """
-    def __init__(self, register_number, name, surname, student_type):
+    def __init__(self, register_number, name, surname, modifiers):
         self.__register_number = register_number
         self.__name = name
         self.__surname = surname
-        self.__student_type = student_type
+        self.__modifiers = tuple(modifiers)
 
     def get_register_number(self):
         return self.__register_number
@@ -41,11 +41,11 @@ class Student:
     def get_surname(self):
         return self.__surname
 
-    def get_student_type(self):
-        return self.__student_type
+    def get_modifiers(self):
+        return self.__modifiers
 
-    def do_you_want_optional(self):
-        return StudentType.OPTIONAL_QUESTIONS == self.__student_type
+    def do_you_want(self, modifier):
+        return modifier in self.__modifiers
 
 
 def translate_students(students_json):
@@ -57,17 +57,20 @@ def translate_students(students_json):
 
     for i in range(len(students_json)):
 
-        if 'type' in students_json[i]:
-            student_type = StudentType.translate_type(students_json[i]['type'])
+        if 'mod' in students_json[i]:
+            if isinstance(students_json[i]['mod'], list):
+                modifiers = [Modifier.translate(mod) for mod in students_json[i]['mod']]
+            else:
+                modifiers = [Modifier.translate(students_json[i]['mod'])]
         else:
-            student_type = StudentType.STANDARD
+            modifiers = []
 
         students.append(
             Student(
                 register_number=i+1,
                 name=students_json[i]['name'],
                 surname=students_json[i]['surname'],
-                student_type=student_type
+                modifiers=modifiers
             )
         )
 

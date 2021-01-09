@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 from math import ceil
 from pylatex import LongTable, NoEscape
-from generator.enums import StudentType
+from generator.enums import Modifier
 import generator.sentences as sentences
 
 
@@ -114,8 +114,8 @@ class VotesData:
         table.add_hline()
         return table
 
-    def insert_table(self, doc, student_type):
-        if StudentType.OPTIONAL_QUESTIONS == student_type:
+    def insert_table(self, doc, has_optional_questions):
+        if has_optional_questions:
             doc.append(self.__votes_with_opt_table)
         else:
             doc.append(self.__standard_votes_table)

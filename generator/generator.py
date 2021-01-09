@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 from json import load as json_load
 from pylatex import *
 from pylatex.utils import bold
+import csv
 from generator.Student import translate_students
 from generator.Test import Test
-from generator.enums import StudentType
+from generator.enums import Modifier
 import generator.sentences as sentences
 
 
@@ -59,7 +60,7 @@ def generate_tests(students_file_name, test_file_name):
         if test.is_single_files():
             doc = generate_doc_file(test.get_language().lower())
 
-        parse_student(doc, student, test, used_randoms_bucket)
+        generate_test_single_student(doc, student, test, used_randoms_bucket)
 
         if test.is_single_files():
             doc.generate_pdf(
@@ -94,7 +95,7 @@ def generate_doc_file(language):
     return doc
 
 
-def parse_student(doc, student, test, used_randoms_bucket):
+def generate_test_single_student(doc, student, test, used_randoms_bucket):
     """
         This function generates a test for the passed student in the given document.
         It prints these things:
@@ -138,10 +139,10 @@ def parse_student(doc, student, test, used_randoms_bucket):
     doc.append(Command('section*', sentences.SECTIONS.REGULATION))
     print_rules(
         doc=doc,
-        duration=test.get_duration(student.get_student_type()),
-        student_type=student.get_student_type(),
+        duration=test.get_duration(student.do_you_want(Modifier.MORE_TIME)),
         is_extra_enabled=test.is_extra_enabled(),
-        is_open_book=test.is_open_book()
+        is_open_book=test.is_open_book(),
+        has_allow_notes=student.do_you_want(Modifier.ALLOW_NOTES)
     )
 
     doc.append(Command('section*', sentences.SECTIONS.EVALUATION))
@@ -149,7 +150,7 @@ def parse_student(doc, student, test, used_randoms_bucket):
     print_points_to_vote_table(
         doc=doc,
         votes_data=test.get_votes_data(),
-        student_type=student.get_student_type()
+        has_optional_questions=student.do_you_want(Modifier.OPTIONAL_QUESTIONS)
     )
     print_earned_points_table(
         doc=doc,
@@ -161,7 +162,7 @@ def parse_student(doc, student, test, used_randoms_bucket):
     used_randoms = print_questions_returning_randoms(
         doc=doc,
         arguments=test.get_arguments(),
-        student_type=student.get_student_type()
+        has_optional_questions=student.do_you_want(Modifier.OPTIONAL_QUESTIONS)
     )
     used_randoms.insert(0, student.get_surname())
     used_randoms_bucket.append(used_randoms)
@@ -205,7 +206,7 @@ def print_title(doc, subject, subtitle):
         center.append(subtitle)
 
 
-def print_rules(doc, duration, student_type, is_extra_enabled, is_open_book):
+def print_rules(doc, duration, is_extra_enabled, is_open_book, has_allow_notes):
     with doc.create(Itemize()) as itemize:
         itemize.add_item(
             sentences.RULES.TIME_PREFIX + ' ' + str(duration) + ' ' + sentences.RULES.TIME_POSTFIX
@@ -217,10 +218,10 @@ def print_rules(doc, duration, student_type, is_extra_enabled, is_open_book):
         if is_open_book:
             itemize.add_item(sentences.RULES.OPEN_BOOK)
         else:
-            if student_type != StudentType.ALLOW_NOTES:
-                itemize.add_item(sentences.RULES.NO_NOTES)
-            else:
+            if has_allow_notes:
                 itemize.add_item(sentences.RULES.YES_NOTES)
+            else:
+                itemize.add_item(sentences.RULES.NO_NOTES)
 
         if is_extra_enabled:
             itemize.add_item(sentences.RULES.EXTRA_POINT)
@@ -235,8 +236,8 @@ def print_evaluation_rule_exercise(doc):
         ex_table.add_row([bold('25%'), sentences.EVALUATION.P25])
 
 
-def print_points_to_vote_table(doc, votes_data, student_type):
-    votes_data.insert_table(doc, student_type)
+def print_points_to_vote_table(doc, votes_data, has_optional_questions):
+    votes_data.insert_table(doc, has_optional_questions)
     doc.append(Command('vspace', NoEscape('-0.5em')))
 
 
@@ -252,7 +253,7 @@ def print_earned_points_table(doc, points_data):
         eval_table.add_row([sentences.EVALUATION.GRADE + ': ', '__________'])
 
 
-def print_questions_returning_randoms(doc, arguments, student_type):
+def print_questions_returning_randoms(doc, arguments, has_optional_questions):
     first = True
     used_randoms = []
     doc.append(sentences.EVALUATION.BEFORE_EX_NOTE)
@@ -269,18 +270,16 @@ def print_questions_returning_randoms(doc, arguments, student_type):
             else:
                 options = 'resume'
             with doc.create(Enumerate(options=options)) as enum:
-                used_randoms += question.print_question_ret_randoms(enum, student_type)
+                used_randoms += question.print_question_ret_randoms(enum, has_optional_questions)
     return used_randoms
 
 
 def generate_used_randoms_file_if_necessary(used_randoms_bucket, name):
     if len(used_randoms_bucket[0]) > 1:
-        with open(name, 'w') as randoms:
-            for student_rands in used_randoms_bucket:
-                for element in student_rands:
-                    randoms.write(str(element) + " ")
-                randoms.write("\n")
-            randoms.close()
+        with open(f'{name}.csv', mode='w') as bucket_file:
+            bucket_writer = csv.writer(bucket_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for list in used_randoms_bucket:
+                bucket_writer.writerow(list)
         return True
     return False
 

@@ -16,8 +16,8 @@ Here is contained all the codes used for the generation.
 
 This file contains two enums:
 
-- **_StudentType_**: useful to determine a category where the student
-belongs, in order to specify his or her needs in the test. According 
+- **_Modifier_**: useful to define some modifications, in order to 
+adapt the test specifically for his or her needs in the test. According 
 to students needs, this software supports people who need more time,
 who need optional questions or who need the permission to use notes.
 - **_QuestionType_**: useful to define the category of the questions.
@@ -44,7 +44,7 @@ format test is requested. It's named **_parse_student_**.
 
 This file contains a class representing a single student.
 It is composed by a name, by a surname, by a register number and by
-a type (_StudentType_). 
+a tuple of modifiers (_Modifiers_). 
 
 There is also a function able to convert the file _student.json_ in
 an array of Students instances.

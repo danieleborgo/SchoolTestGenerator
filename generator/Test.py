@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2020  Borgo Daniele
+    Copyright (C) 2021  Borgo Daniele
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 from random import seed
 from warnings import warn
-from generator.enums import StudentType
+from generator.enums import Modifier
 from generator.Argument import Argument
 from generator.test_support import PointsData, VotesData
 from os import mkdir, path
@@ -119,8 +119,8 @@ class Test:
     def get_date(self):
         return self.__date
 
-    def get_duration(self, student_type):
-        if student_type == StudentType.MORE_TIME:
+    def get_duration(self, has_more_time_mod):
+        if has_more_time_mod:
             return self.__more_time_duration
         return self.__duration
 
@@ -146,4 +146,4 @@ class Test:
         return self.__out_folder if self.__out_folder is not None else ''
 
     def get_bucket_name(self):
-        return 'used_randoms_bucket_' + self.__class + '.txt'
+        return 'used_randoms_bucket_' + self.__class

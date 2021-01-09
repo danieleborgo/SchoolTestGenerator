@@ -6,16 +6,21 @@
   {
     "name": "More Time",
     "surname": "Surname 2",
-    "type": "more_time"
+    "mod": "more_time"
   },
   {
     "name": "Optional Questions",
     "surname": "Surname 3",
-    "type": "optional_questions"
+    "mod": ["optional_questions"]
   },
   {
     "name": "Allow Notes",
     "surname": "Surname 4",
-    "type": "allow_notes"
+    "mod": "allow_notes"
+  },
+  {
+    "name": "Allow all",
+    "surname": "Surname 4",
+    "mod": ["more_time", "optional_questions", "allow_notes"]
   }
 ]

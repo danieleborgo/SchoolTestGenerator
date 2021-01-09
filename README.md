@@ -102,12 +102,13 @@ Further and detailed information are given in the
 
 This file contains all the information related to the students,
 represented by objects in an array. These are composed by three fields:
-**_name_**, **_surname_** and **_type_**. The types modify the
+**_name_**, **_surname_**, and **_mod_**. This last modifies the
 behaviour of the generation in function of the student needs, in order
 to follow the directives the school decided for each situation. The
-allowed types are:  **_more_time_**,  **_optional_questions_**,
-**_allow_notes_** and, obviously,  **_standard_**. If not specified,
-the student is assumed to belong to this last.
+allowed modifiers are:  **_more_time_**,  **_optional_questions_**,
+**_allow_notes_**. They can be expressed through an array,
+independently by their quantity, of through a direct specification if
+just one is required.
 
 ## 6. How to create **_text.json_**
 
@@ -227,16 +228,14 @@ according to the student's type. It's important remember to specify the
 points value and if the question is mandatory or less in the
 generation. The two already implemented question can be an example.
 
-### 7.2. Adding a new student's type
+### 7.2. Adding a new modifiers
 
-After adding it in **_StudentType_** in 
-[enums.py](./generator/enums.py), the next step strictly depends on 
-which is the effect of this new category. All the questions, before
-being generated, receive the student's type as parameter and this can 
-be exploited to generate different version of the question, like it
-happens for the students that need optional questions. Some functions,
-like the one that generates the rules, receive the student's type as
-parameter.
+After adding it in **_Modifier_** in [enums.py](./generator/enums.py),
+the next step strictly depends on which is the effect of this new
+modifier. All the questions, before being generated, can receive 
+some flags related to these as parameter and this can 
+be exploited to generate different versions of the question, like it
+happens for the students that need optional questions.
 
 ### 7.3. Adding a new grades format
 
@@ -274,7 +273,7 @@ only need to be disjoint.
 
 ## 8. Author
 
-This software was developed by Borgo Daniele in 2019 and 2020.
+This software was developed by Borgo Daniele in _range(2019, 2021)_.
 
 ## 9. License
 
