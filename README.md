@@ -20,7 +20,12 @@ change if some basic data of the test is modified.
 2. [How to run](#2-how-to-run)
 3. [Example of use](#3-example-of-use)
 4. [How it works](#4-how-it-works)
-5. [How to create _student.json_](#5-how-to-create-_studentjson_)
+5. [How to create **_users.json_**](#5-how-to-create-_usersjson_)
+   
+   5.1. [**_students.json_**](#51-_studentsjson_)
+   
+   5.2. [**_anonymous_users.json_**](#52-_anonymous_usersjson_)
+   
 6. [How to create _text.json_](#6-how-to-create-_textjson_)
     
     6.1. [The parameter _votes_](#61-the-parameter-_votes_)
@@ -31,7 +36,7 @@ change if some basic data of the test is modified.
 
     7.1. [Adding a new question type](#71-adding-a-new-question-type)
     
-    7.2. [Adding a new student's type](#72-adding-a-new-students-type)
+    7.2. [Adding a new student's type](#72-adding-a-new-modifier)
     
     7.3. [Adding a new grades format](#73-adding-a-new-grades-format)
     
@@ -46,29 +51,39 @@ change if some basic data of the test is modified.
 
 ## 1. Required installed software
 
-This software was written using **Python 3.6** with the package
+This software was written using **Python 3.8** with the package
 **PyLaTex**. It also requires an installed version of **LaTex**,
 which has to have downloaded all the necessary packages. One of the
 major source of errors in the first execution is the lack of some LaTex
-packages or, in some version, of the Perl language installed on
-Windows.
+packages or, in some version, of the Perl language installed.
 
 ## 2. How to run
 
 This program needs two JSON file names in input:
 
-- A JSON file containing all the information related to the students;
+- A JSON file containing all the information related to the users;
 - A JSON file containing all the information related to the test.
 
-These two should be passed as parameter to the file _main.py_:
+The users can be of two types:
 
-    python main.py students.json test.json
-    
+- Named students: in this case the tests will be generated with the
+students name fields already compiled.
+- Anonymous users: the tests name fields will be left uncompleted,
+so they will require manual completion.
+
+Just as the program would write if it receives _-h_ as parameter,
+this is the command structure to execute the program:
+
+    usage: main.py [-h] [-s STUDENTS_PATH | -a USERS_PATH] TEST_PATH
+
+The argument _TEST_PATH_ indicates the path where the test JSON 
+configuration file is located, while STUDENTS_PATH and USERS_PATH
+define the one of the related students or of anonymous users file.
+Because of this definition, the program is able to generate one
+type at once.
+
 The used interpreter has to have installed all the required Python
 packages. The names are only symbolic.
-
-This software was developed using PyCharm, which can simplify the
-execution and the package installation of this software.
 
 ## 3. Example of use
 
@@ -85,8 +100,8 @@ function that does these operations:
 - It extracts the information from the tho JSONs, storing them is 
 apposite structures, decorating them with various data in order to
 avoid endless nested sequences of _ifs_.
-- For each student, it calls a proper function that generates a test
-following school directives regarding her or his different needs.
+- For each student, it calls a proper function that generates a single
+test following school directives regarding her or his different needs.
 - It creates a file containing all the random values used in the test
 in function of each student, in order to simplify correction.
 
@@ -95,10 +110,17 @@ calls other ones, specific for this type of test. In order to change
 the behaviour of the generator, it's necessary modifying these
 invocations.
 
+In case the anonymous users are requested, the program follows the
+same points defined before, but it avoids completing the name fields.
+Also with this configuration is possible to generate differents tests
+according to various special needs.
+
 Further and detailed information are given in the 
 [generator package](./generator).
 
-## 5. How to create **_student.json_**
+## 5. How to create **_users.json_**
+
+### 5.1 **_students.json_**
 
 This file contains all the information related to the students,
 represented by objects in an array. These are composed by three fields:
@@ -108,13 +130,29 @@ to follow the directives the school decided for each situation. The
 allowed modifiers are:  **_more_time_**,  **_optional_questions_**,
 **_allow_notes_**. They can be expressed through an array,
 independently by their quantity, of through a direct specification if
-just one is required.
+just one is required. This is an example of a student:
+
+    {
+        "name": "Hello",
+        "surname": "World",
+        "mod": "more_time"
+    }
+
+### 5.2 **_anonymous_users.json_**
+
+This file works similarly to the previous one, the only difference is
+that the names and the surnames are not specified. This is an example
+of an anonymous student without modifiers:
+
+    {
+        # No data is needed
+    }
 
 ## 6. How to create **_text.json_**
 
-This file contains all the data regarding the school test, consequently
-it has a lot of parameters, these are the single value ones (if not
-specified, they're strings):
+This file contains all the configurations referring to the school test, 
+consequently it has a lot of parameters, these are the single value
+ones (if not specified, they're strings):
 
 - **_subject_**: this contains the school subject name;
 - **_subtitle_**: this contains the test argument;
@@ -123,6 +161,7 @@ to import the related properties file;
 - **_class_**: this is the class which the students belong to;
 - **_years_**: this is the class school year;
 - **_date_**: this is the test date;
+- **_logo_**: this is the school logo path;
 - **_duration_** (_int_): this is the standard test duration in
 minutes;
 - **_more_time_duration_** (optional, _int_): this is the duration for
@@ -141,6 +180,23 @@ all the files have to be placed and, if not set, it uses the actual one;
 - **_extra_params_** (optional, _array_): this field contains an array
 of strings, representing some external things to evaluate for giving
 the grade, like homework or projects.
+  
+This is an example of these parameters:
+
+    "subject": "Test subject",
+    "subtitle": "Subtitle",
+    "language": "English",
+    "class": "class name",
+    "years": "2019 - 2020",
+    "date": "13/12/2019",
+    "logo": "../images/school_logo.png",
+    "duration": 60,
+    "more_time_duration": 70,
+    "extra_point": true,
+    "open_book": false,
+    "single_files": false,
+    "out_folder": "sample",
+    "extra_params": ["Project"]
 
 ### 6.1. The parameter **_votes_**
 
@@ -156,37 +212,51 @@ it.
 
 The intermediate votes inside the two limiters are computed at runtime.
 
+This example defines that the minimum grade is 2, gained with at most
+two points, while the maximum is 10, gained with ten points or more.
+
+    "votes": {
+        "min": {
+            "vote": 2,
+            "up_to": 2
+        },
+        "max": {
+            "vote": 10,
+            "from": 10
+        }
+    }
+
 ### 6.2. The parameter **_arguments_**
 
 This is the section that contains the real test and all its questions.
 It is organized as an array of arguments, which represent a big
 section, where each of them contains a set of questions.
 
-An argument is composed byan **_argument_name_** and an array of
+An argument is composed by an **_argument_name_** and an array of
 **_questions_**. These lasts can be of a lot of types, according to
 what the apposite parameter specifies, consequently they may have
 different fields. These are the ones in common:
 
 - **_type_**: this defines the question category;
 - **_optional_** (optional, _boolean_): declares the question as
-optional for the students who need less questions;
+optional for the students who need fewer questions;
 - **_points_** (optional, _int_): define the value in points of the
 question and, if not specified, its value is one.
 
 If the argument has a description, this can be set through 
 **_argument_text_**. If it's necessary to shuffle the questions
-in an argument, the flag **_shufle_** has to be set to true. These
+in an argument, the flag **_shuffle_** has to be set to true. These
 fields are both optional.
 
 #### The types **_no_space_question_** and types **_spaced_question_**
 
 These two types indicate simple open questions where the student has to
-write the answer. The only difference between these two is that the 
+write the answer. The only difference, between these, is that the 
 second provide an additional space under the question, while the first
 not. These two have in common these fields:
 
 - **_text_**: this contains the question in form of string or in form
-of strings array if the flag **_array_** is set to true. It can contain
+of strings array. It can contain
 several **_%n_** that will be substituted with a random value chosen
 according to the rules of the following point.
 - **_values_** (_array_): this field, optional if the **_text_**
@@ -200,9 +270,28 @@ specify one policy. There are three policies, stored in the parameter
     [**_min_**, **_max_**] with the specified number of **_digits_**;
     - **_set_**: this specifies the value is picked randomly in a set,
     stored in the array field **_set_**.
-- **_array_** (optional, _boolean_): if set and true it defines the
-field **_text_** as an array of strings that the program will
-concatenate.
+
+This is the code for generating a question containing a random int
+and a random float. The first belongs to [0, 40] the second to 
+[-10, -1] with two decimal digits.
+
+    {
+        "type": "no_space_question",
+        "text": "int: %n, float %n",
+        "values": [
+            {
+                "type": "int",
+                "min": 0,
+                "max": 40
+            },
+            {
+                "type": "float",
+                "min": -10,
+                "max": -1,
+                "digits": 2
+            }
+        ]
+    }
     
 The type **_spaced_question_** requires an additional integer field
 named  **_row_** where it's necessary specify an integer number of rows
@@ -218,7 +307,7 @@ most common needs.
 The first thing to do is to add it in the **_QuestionType_** enum in
 [enums.py](./generator/enums.py), then to explain to the program how to
 parse it. Consequently, in the class **_Question_** in
-[Argument.py](./generator/Argument.py), the constructor offers a simple
+[Argument.py](generator/test/Argument.py), the constructor offers a simple
 way to add it, using its _ifs_ structure. In the constructor it's
 possible  parsing new JSON fields but it's mandatory to set the field
 **_\_\_print_question_** with a method takes as parameters an enum and
@@ -228,7 +317,7 @@ according to the student's type. It's important remember to specify the
 points value and if the question is mandatory or less in the
 generation. The two already implemented question can be an example.
 
-### 7.2. Adding a new modifiers
+### 7.2. Adding a new modifier
 
 After adding it in **_Modifier_** in [enums.py](./generator/enums.py),
 the next step strictly depends on which is the effect of this new
@@ -239,7 +328,7 @@ happens for the students that need optional questions.
 
 ### 7.3. Adding a new grades format
 
-In [test_support.py](./generator/test_support.py), in the last rows,
+In [test_support.py](generator/test/test_support.py), in the last rows,
 there is an object that translates a float vote in a more conventional
 representation. Modifying that, the program would be able to support
 other types of grades.

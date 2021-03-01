@@ -18,7 +18,15 @@
 from generator.enums import Modifier
 
 
-class Student:
+class User:
+    def __init__(self, modifiers):
+        self.__modifiers = tuple(modifiers)
+
+    def do_you_need(self, modifier):
+        return modifier in self.__modifiers
+
+
+class Student(User):
     """
         This class represents a single student through these:
         - A register number
@@ -27,25 +35,27 @@ class Student:
         - A type for describe students needs
     """
     def __init__(self, register_number, name, surname, modifiers):
+        super().__init__(modifiers)
         self.__register_number = register_number
         self.__name = name
         self.__surname = surname
-        self.__modifiers = tuple(modifiers)
 
-    def get_register_number(self):
+    @property
+    def register_number(self):
         return self.__register_number
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
-    def get_surname(self):
+    @property
+    def surname(self):
         return self.__surname
 
-    def get_modifiers(self):
-        return self.__modifiers
 
-    def do_you_want(self, modifier):
-        return modifier in self.__modifiers
+class AnonymousUser(User):
+    def __init__(self, modifiers):
+        super().__init__(modifiers)
 
 
 def translate_students(students_json):
@@ -56,22 +66,27 @@ def translate_students(students_json):
     students = []
 
     for i in range(len(students_json)):
-
-        if 'mod' in students_json[i]:
-            if isinstance(students_json[i]['mod'], list):
-                modifiers = [Modifier.translate(mod) for mod in students_json[i]['mod']]
-            else:
-                modifiers = [Modifier.translate(students_json[i]['mod'])]
-        else:
-            modifiers = []
-
         students.append(
             Student(
                 register_number=i+1,
                 name=students_json[i]['name'],
                 surname=students_json[i]['surname'],
-                modifiers=modifiers
+                modifiers=extract_mods(students_json[i])
             )
         )
 
-    return students
+    return tuple(students)
+
+
+def translate_anonymous_user(anonymous_user):
+    return tuple([
+        AnonymousUser(extract_mods(user_json)) for user_json in anonymous_user
+    ])
+
+
+def extract_mods(user_json):
+    if 'mod' in user_json:
+        if isinstance(user_json['mod'], list):
+            return [Modifier.translate(mod) for mod in user_json['mod']]
+        return [Modifier.translate(user_json['mod'])]
+    return []

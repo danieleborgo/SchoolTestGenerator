@@ -1,35 +1,80 @@
 # Package generator
 
-Here is contained all the codes used for the generation.
+In this package there are all the codes used for the generation.
 
 ## Index
 
-1. [enums.py](#1-enumspyenumspy)
-2. [generator.py](#2-generatorpygeneratorpy)
-3. [Student.py](#3-studentpystudentpy)
-4. [Test.py](#4-testpytestpy)
-5. [Argument.py](#5-argumentpyargumentpy)
-6. [test_support.py](#6-test_supportpytest_supportpy)
-7. [Sentences.py](#7-sentencespysentencespy)
+1. [The package test](#1-the-package-testtest)
+   
+    1.1. [Argument.py](#11-argumentpytestargumentpy)
+    
+    1.2. [Question.py](#12-questionpytestquestionpy)
+    
+    1.3. [Test.py](#13-testpytesttestpy)
+    
+    1.4. [test_support.py](#14-test_supportpytesttest_supportpy)
+    
+    1.5. [TestLogger.py](#15-testloggerpytesttestloggerpy)
 
-## 1. [enums.py](./enums.py)
+2. [enums.py](#2-enumspyenumspy)
+3. [generator.py](#3-generatorpygeneratorpy)
+4. [Sentences.py](#4-sentencespysentencespy)
+5. [User.py](#5-userpyuserpy)
+
+## 1. The package [test](./test)
+
+This package contains all the classes and all the functions needed to
+interpret and reorganize the data for generating the tests.
+
+### 1.1. [Argument.py](./test/Argument.py)
+
+The class **_Argument_** represents the JSON parameter equivalent and
+contains a group of questions in form of _Question_ instance.
+
+### 1.2. [Question.py](./test/Question.py)
+
+The class **_Question_** represent, obviously, a simple question and 
+all its related data, like points and random values handler, managed
+through **_RandomHandler_**.
+
+### 1.3. [Test.py](./test/Test.py)
+
+This class contains the class used to optimize the test generator. It
+extracts all the data from the JSON and, eventually, it completes the
+optional parameters with default values. If it's necessary add further
+parameters in the JSON, this is the place where they have to be parsed.
+
+The used term _optimization_ is not meant regarding to the execution
+time but to the avoidance of _spaghetti code_.
+
+### 1.4. [test_support.py](./test/test_support.py)
+
+The classes **_PointsData_** and **_VotesData_** optimize their table
+generation.
+
+### 1.5. [TestLogger.py](./test/TestLogger.py)
+
+At the end of each generation, a logger is generated using the data
+stored in this class.
+
+## 2. [enums.py](./enums.py)
 
 This file contains two enums:
 
-- **_Modifier_**: useful to define some modifications, in order to 
-adapt the test specifically for his or her needs in the test. According 
-to students needs, this software supports people who need more time,
+- **_Modifier_**: useful to define some modifications in order to 
+adapt the test specifically for the student needs in the test. According 
+to these needs, this software supports people who need more time,
 who need optional questions or who need the permission to use notes.
 - **_QuestionType_**: useful to define the category of the questions.
 Actually, two simple questions are supported, but can be easily
 extended to support more.
 
-## 2. [generator.py](./generator.py)
+## 3. [generator.py](./generator.py)
 
 This is the main core of the software and contains the function that
-takes as parameters the two JSONs and generates the document. This
-translates the two files in objects able to optimize the generation
-and then iterates on the students array, generating one test per time,
+takes as parameters some JSONs and generates the document. This
+translates these files in objects able to optimize the generation
+and then iterates on the users array, generating one test per time,
 invoking a proper function. This function is also responsible to collect
 all the random values generated and to save them in a specific file in
 order to make easier the correction. This function's named 
@@ -38,43 +83,24 @@ order to make easier the correction. This function's named
 The function invoked to generate a single test contains several calls
 to  specific other functions that generate all the elements in a page
 and this should be the one that requires to be modified if a different
-format test is requested. It's named **_parse_student_**.
+format test is requested. It's named **_generate_test_single_user_**.
 
-## 3. [Student.py](./Student.py)
-
-This file contains a class representing a single student.
-It is composed by a name, by a surname, by a register number and by
-a tuple of modifiers (_Modifiers_). 
-
-There is also a function able to convert the file _student.json_ in
-an array of Students instances.
-
-## 4. [Test.py](./Test.py)
-
-This class contains the class used to optimize the test generator. It
-extracts all the data from the JSON and, eventually, it completes the
-optional parameters with default values. If it's necessary add further
-parameters in the JSON, this is the place where they have to be parsed.
-
-The used term _optimization_ is not meant regarding to the execution time
-but to the avoidance of _spaghetti code_.
-
-## 5. [Argument.py](./Argument.py)
-
-The class **_Argument_** represents the JSON parameter equivalent and
-contains a group of questions.
-
-The class **_Question_** represent, obviously, a simple question and 
-all its related data, like points and random values handler, managed
-through **_RandomHandler_**.
-
-## 6. [test_support.py](./test_support.py)
-
-The classes **_PointsData_** and **_VotesData_** optimize their table
-generation.
-
-## 7. [Sentences.py](sentences.py)
+## 4. [Sentences.py](sentences.py)
 
 This file is used to import strings in different languages. It contains
 several constants, grouped in objects, that are filled at runtime
-extracting them from the passed properties file.
+extracting them from the passed properties file. This program doesn't
+support the generation of tests in different languages at the same time.
+For doing this, it's necessary to create multiple _test.json_ configured
+in different languages.
+
+## 5. [User.py](User.py)
+
+This file contains the classes representing a single user. These can
+be of two types as defined in the main repository README: students and
+anonymous users. The firsts are composed by a name, by a surname, 
+by a register number and by a tuple of modifiers (_Modifiers_). The
+seconds don't have names, so they require just the modifiers.
+
+There are also a functions able to convert the files _student.json_
+and _anonymous_users.json_ in a tuple of users.

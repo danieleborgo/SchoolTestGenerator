@@ -17,10 +17,8 @@
 
 from random import seed
 from warnings import warn
-from generator.enums import Modifier
-from generator.Argument import Argument
-from generator.test_support import PointsData, VotesData
-from os import mkdir, path
+from generator.test.Argument import Argument
+from generator.test.test_support import PointsData, VotesData
 import generator.sentences as sentences
 
 
@@ -35,26 +33,21 @@ class Test:
         tables.
     """
 
-    def __init__(self, test_json):
-        self.__extract_parameters(test_json)
+    def __init__(self, test_json, test_logger):
+        self.__extract_parameters(test_json, test_logger)
         seed(self.__generate_seed())
 
-    def __extract_parameters(self, test_json):
+    def __extract_parameters(self, test_json, test_logger):
         self.__subject = test_json['subject']
         self.__subtitle = test_json['subtitle']
         self.__language = test_json['language'].capitalize()
-        self.__class = test_json['class']
+        self.__class = test_json['class'] if 'class' in test_json else None
         self.__years = test_json['years']
         self.__date = test_json['date']
+        self.__logo_img_path = test_json['logo'] if 'logo' in test_json else None
         self.__duration = test_json['duration']
         self.__extra_point_en = test_json['extra_point'] if 'extra_point' in test_json else False
         self.__is_open_book = test_json['open_book'] if 'open_book' in test_json else False
-        self.__single_files = test_json['single_files'] if 'single_files' in test_json else False
-
-        self.__out_folder = test_json['out_folder'] + '/' if 'out_folder' in test_json else None
-        if self.__out_folder is not None:
-            if not path.isdir(self.__out_folder):
-                mkdir(self.__out_folder)
 
         sentences.import_sentences(self.__language)
 
@@ -66,7 +59,7 @@ class Test:
         else:
             self.__more_time_duration = self.__duration
 
-        total_points = self.__extract_arguments(test_json['test'])
+        total_points = self.__extract_arguments_and_points(test_json['test'], test_logger)
         self.__votes_data = VotesData(test_json['votes'], self.__optionals_count)
 
         self.__points_data = PointsData(
@@ -76,18 +69,18 @@ class Test:
             additional_params=test_json['extra_params'] if 'extra_params' in test_json else [],
         )
 
-    def __extract_arguments(self, arguments_json):
+    def __extract_arguments_and_points(self, arguments_json, test_logger):
         self.__arguments = []
         self.__number_of_questions = 0
         self.__optionals_count = 0
         total_points = 1 if self.__extra_point_en else 0
 
-        for i in range(len(arguments_json)):
-            argument = Argument(arguments_json[i])
+        for single_argument_json in arguments_json:
+            argument = Argument(single_argument_json, test_logger)
 
-            self.__number_of_questions += argument.get_number_of_questions()
-            total_points += argument.get_points()
-            self.__optionals_count += argument.get_optionals_count()
+            self.__number_of_questions += argument.number_of_questions
+            total_points += argument.total_points
+            self.__optionals_count += argument.optionals_count
 
             self.__arguments.append(argument)
 
@@ -98,40 +91,10 @@ class Test:
         # This should be unique for each test in each class
         return self.__subject + self.__subtitle + self.__class + self.__years
 
-    def get_output_file_name(self):
-        return self.__subtitle + '_' + self.__class
-
-    def get_subject(self):
-        return self.__subject
-
-    def get_subtitle(self):
-        return self.__subtitle
-
-    def get_language(self):
-        return self.__language
-
-    def get_test_class(self):
-        return self.__class
-
-    def get_years(self):
-        return self.__years
-
-    def get_date(self):
-        return self.__date
-
     def get_duration(self, has_more_time_mod):
         if has_more_time_mod:
             return self.__more_time_duration
         return self.__duration
-
-    def get_points_data(self):
-        return self.__points_data
-
-    def get_votes_data(self):
-        return self.__votes_data
-
-    def get_arguments(self):
-        return self.__arguments
 
     def is_extra_enabled(self):
         return self.__extra_point_en
@@ -139,11 +102,42 @@ class Test:
     def is_open_book(self):
         return self.__is_open_book
 
-    def is_single_files(self):
-        return self.__single_files
+    @property
+    def subject(self):
+        return self.__subject
 
-    def get_out_path(self):
-        return self.__out_folder if self.__out_folder is not None else ''
+    @property
+    def subtitle(self):
+        return self.__subtitle
 
-    def get_bucket_name(self):
-        return 'used_randoms_bucket_' + self.__class
+    @property
+    def language(self):
+        return self.__language
+
+    @property
+    def test_class(self):
+        return self.__class
+
+    @property
+    def years(self):
+        return self.__years
+
+    @property
+    def date(self):
+        return self.__date
+
+    @property
+    def logo_img_path(self):
+        return self.__logo_img_path
+
+    @property
+    def points_data(self):
+        return self.__points_data
+
+    @property
+    def votes_data(self):
+        return self.__votes_data
+
+    @property
+    def arguments(self):
+        return self.__arguments

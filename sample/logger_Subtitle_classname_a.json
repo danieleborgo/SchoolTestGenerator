@@ -1,0 +1,87 @@
+{
+    "mode": "anonymous",
+    "questions": {
+        "Different random values": [
+            "Question 1: These are values different for everyone: %n (int) and %n (float).",
+            "Question 2: This is a random value from a set: %n.",
+            "Question 3: This question is standard."
+        ],
+        "Different points and optionality": [
+            "Question 4: This question is optional for someone.",
+            "Question 5: This question has three points.",
+            "Question 6: This question has no points."
+        ],
+        "Set of different representations and new lines": [
+            "Question 7:\\\\ Here is possible doing this\\\\ in a single\\\\ string.",
+            "Question 8: This question has some space for answer.",
+            "Question 9: \\\\ This question is stored in form of an array in the JSON file."
+        ],
+        "Combining all this stuff": [
+            "Question 10: \\\\ Hello, take some different values: %n, %n and %n."
+        ]
+    },
+    "tests": [
+        {
+            "type": "anonymous",
+            "orders": [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    0
+                ]
+            ],
+            "random": [
+                16,
+                -1.75,
+                "three",
+                7,
+                11.91,
+                "Hi"
+            ]
+        },
+        {
+            "type": "anonymous",
+            "orders": [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    2,
+                    0,
+                    1
+                ],
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    0
+                ]
+            ],
+            "random": [
+                28,
+                -8.79,
+                "three",
+                1,
+                11.4,
+                "Hi"
+            ]
+        }
+    ]
+}

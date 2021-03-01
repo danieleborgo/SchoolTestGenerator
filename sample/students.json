@@ -19,7 +19,7 @@
     "mod": "allow_notes"
   },
   {
-    "name": "Allow all",
+    "name": "All",
     "surname": "Surname 4",
     "mod": ["more_time", "optional_questions", "allow_notes"]
   }

@@ -16,72 +16,17 @@
 """
 
 from random import randint, uniform, choice
-from pylatex import NoEscape
-from random import shuffle
-from generator.enums import QuestionType, Modifier
-import generator.sentences as sentences
+from generator import sentences
+from generator.enums import QuestionType
 
 # This is the token that will represent a random value in the JSON text representation
-RANDOM_NUMBER_TOKEN = '%n'
+RANDOM_VALUE_TOKEN = '%n'
 
 # This is how break line characters are represented in the JSON text
 NEW_LINE_TOKEN = '\n'
 
 # This is how break lines are in Latex
 NEW_LINE_LATEX = '\\\\ '
-
-
-class Argument:
-    """
-        This class represents an argument, so a group of questions with a name.
-        It is also used to keep track of the points.
-    """
-
-    def __init__(self, argument_json):
-        self.__name = argument_json['argument_name']
-        self.__questions = []
-        self.__total_points = 0
-        self.__optionals_points = 0
-        self.__shuffle = argument_json['shuffle'] if 'shuffle' in argument_json else False
-
-        if 'argument_text' in argument_json:
-            self.__argument_text = argument_json['argument_text'].replace(NEW_LINE_TOKEN, NEW_LINE_LATEX)
-        else:
-            self.__argument_text = None
-
-        # Import questions and computes the argument points and the number of optional questions
-        for i in range(len(argument_json['questions'])):
-            question = Question(argument_json['questions'][i])
-            self.__total_points += question.get_points()
-            self.__optionals_points += question.get_points() if question.is_optional() else 0
-            self.__questions.append(question)
-        self.__questions = tuple(self.__questions)
-
-    def get_name(self):
-        return self.__name
-
-    def do_you_have_arg_text(self):
-        return self.__argument_text is not None
-
-    def get_argument_text(self):
-        return self.__argument_text
-
-    def get_number_of_questions(self):
-        return len(self.__questions)
-
-    def get_questions(self):
-        if not self.__shuffle:
-            return self.__questions
-
-        to_return = list(self.__questions)
-        shuffle(to_return)
-        return tuple(to_return)
-
-    def get_points(self):
-        return self.__total_points
-
-    def get_optionals_count(self):
-        return self.__optionals_points
 
 
 class Question:
@@ -93,18 +38,19 @@ class Question:
         - text with all the random values generator, the objects able to handle random generation
     """
 
-    def __init__(self, question_json):
+    def __init__(self, question_json, text_bucket):
         self.__type = QuestionType.translate_type(question_json['type'])
         self.__points = question_json['points'] if 'points' in question_json else 1
         self.__is_optional = question_json['optional'] if 'optional' in question_json else False
+        self.__extract_standard_question(question_json)
+
+        text_bucket.add(self.__text)
 
         if self.__type == QuestionType.NO_SPACED_QUESTION:
-            self.__extract_standard_question(question_json)
             self.__print_question = self.__print_no_space_question_ret_randoms
             return
 
         if self.__type == QuestionType.SPACED_QUESTION:
-            self.__extract_standard_question(question_json)
             self.__appendix = NEW_LINE_LATEX * (1 + question_json['rows'])
             self.__print_question = self.__print_spaced_question_ret_randoms
             return
@@ -116,19 +62,24 @@ class Question:
         """
 
         # Text extraction
-        if 'array' in question_json and question_json['array']:
+        if isinstance(question_json['text'], list):
             self.__text = ''.join(iter(question_json['text']))
         else:
             self.__text = question_json['text']
         self.__text = self.__text.replace(NEW_LINE_TOKEN, NEW_LINE_LATEX)
 
         # Random values handlers creation
-        n_occurrences = self.__text.count(RANDOM_NUMBER_TOKEN)
+        n_occurrences = self.__text.count(RANDOM_VALUE_TOKEN)
         if 'values' in question_json:
-            self.__random_handlers = self.__extract_random_handlers(question_json['values'], n_occurrences)
+            self.__random_handlers = self.__extract_random_handlers(
+                question_json['values'],
+                n_occurrences
+            )
         else:
             if n_occurrences > 0:
-                raise Exception("There are some tokens in the string but no random values were provided")
+                raise Exception(
+                    "There are some tokens in the string but no random values were provided"
+                )
             self.__random_handlers = []
 
     def __extract_random_handlers(self, values_json, expected_n_values):
@@ -143,8 +94,10 @@ class Question:
             random_handlers.append(RandomHandler(random_json))
 
         if expected_n_values != len(random_handlers):
-            raise Exception("Warning: the number of specified random generator doesn't coincide with the " +
-                            RANDOM_NUMBER_TOKEN + " found in:" + self.__text)
+            raise Exception(
+                "Warning: the number of specified random generator doesn't coincide with the " +
+                RANDOM_VALUE_TOKEN + " found in:" + self.__text
+            )
 
         return random_handlers
 
@@ -153,30 +106,45 @@ class Question:
         random_nums = []
         for i in range(len(random_handlers)):
             random_nums.insert(i, random_handlers[i].get_random())
-            text = text.replace(RANDOM_NUMBER_TOKEN, str(random_nums[i]), 1)
-        return [text, random_nums]
-
-    def get_points(self):
-        return self.__points
+            text = text.replace(RANDOM_VALUE_TOKEN, str(random_nums[i]), 1)
+        return text, random_nums
 
     def is_optional(self):
         return self.__is_optional
 
-    def __print_no_space_question_ret_randoms(self, enum, has_optional_questions, appendix=''):
-        [text, used_randoms] = self.__substitute_random_values_returning(self.__text, self.__random_handlers)
+    def __print_no_space_question_ret_randoms(self, has_optional_questions, appendix=''):
+        text, used_randoms = self.__substitute_random_values_returning(
+            self.__text,
+            self.__random_handlers
+        )
+
         to_print = '(' + str(self.__points) + \
                    (', ' + sentences.OTHERS.OPTIONAL
                     if self.__is_optional and has_optional_questions else '') \
                    + ') ' + text + appendix
-        enum.add_item(NoEscape(to_print))
 
-        return used_randoms
+        return to_print, used_randoms
 
-    def __print_spaced_question_ret_randoms(self, enum, has_optional_questions):
-        return self.__print_no_space_question_ret_randoms(enum, has_optional_questions, self.__appendix)
+    def __print_spaced_question_ret_randoms(self, has_optional_questions):
+        return self.__print_no_space_question_ret_randoms(has_optional_questions, self.__appendix)
 
-    def print_question_ret_randoms(self, enum, has_optional_questions):
-        return self.__print_question(enum, has_optional_questions)
+    def print_question_ret_randoms(self, has_optional_questions):
+        return self.__print_question(has_optional_questions)
+
+    @property
+    def points(self):
+        return self.__points
+
+
+class QuestionsTextsBucket:
+    def __init__(self):
+        self.__bucket = []
+
+    def add(self, text: str):
+        self.__bucket.append(text)
+
+    def get_questions_texts(self):
+        return tuple(self.__bucket)
 
 
 class RandomHandler:
@@ -195,18 +163,18 @@ class RandomHandler:
 
         if 'set'.__eq__(rand_type):
             self.__set = tuple(random_json['set'])
-            self.__random_generator = self.__get_from_set
+            self.__generate_random = self.__get_from_set
             return
 
         if 'float'.__eq__(rand_type):
             self.__import_min_max(random_json)
             self.__size = 2
-            self.__random_generator = self.__get_limited_float
+            self.__generate_random = self.__get_limited_float
             return
 
         if 'int'.__eq__(rand_type):
             self.__import_min_max(random_json)
-            self.__random_generator = self.__get_limited_int
+            self.__generate_random = self.__get_limited_int
             return
 
         raise Exception("Unknown random value type: " + rand_type)
@@ -225,4 +193,4 @@ class RandomHandler:
         return round(uniform(self.__start, self.__end), self.__size)
 
     def get_random(self):
-        return self.__random_generator()
+        return self.__generate_random()

@@ -1,9 +1,30 @@
-# Sample
+# Samples
 
 This folder provides an example that shows all the features available
 in this software. It was generated running this in the root:
 
-    python main.py sample/students.json sample/test.json
+    python main.py sample/test.json -s sample/students.json
 
 The output is made by the PDF file, representing the real test, and by a
-CSV file containing the random values used.
+JSON file containing the the test logger with the used random values.
+
+For executing the program for anonymous users, this can be used:
+
+    python main.py sample/test.json -a sample/anonymous_users.json
+
+This is what the program writes when _-h_ is passed as argument:
+    
+    usage: main.py [-h] [-s STUDENTS_PATH | -a USERS_PATH] test_path
+    
+    This program generates school tests
+    
+    positional arguments:
+      test_path             The path of the JSON test file
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -s STUDENTS_PATH, --students STUDENTS_PATH
+                            Add the path of named students JSON file
+      -a USERS_PATH, --anonymous USERS_PATH
+                            Add the path of anonymous students JSON file
+

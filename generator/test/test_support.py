@@ -17,7 +17,6 @@
 
 from math import ceil
 from pylatex import LongTable, NoEscape
-from generator.enums import Modifier
 import generator.sentences as sentences
 
 
@@ -56,7 +55,8 @@ class PointsData:
     def insert_eval_table(self, doc):
         doc.append(self.__eval_table)
 
-    def get_total_points(self):
+    @property
+    def total_points(self):
         return self.__total_points
 
 
