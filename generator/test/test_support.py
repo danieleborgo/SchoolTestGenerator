@@ -81,7 +81,8 @@ class VotesData:
         # The first is the table string, the second the row containing earned points and the third the grades
         string_st, points_st, votes_st = self.__create_earned_votes_array(max_vote, max_required_points,
                                                                           min_vote, min_required_points)
-        string_wo, points_wo, votes_wo = self.__create_earned_votes_array(max_vote, max_required_points-optional_count,
+        string_wo, points_wo, votes_wo = self.__create_earned_votes_array(max_vote,
+                                                                          max_required_points - optional_count,
                                                                           min_vote, min_required_points)
 
         self.__standard_votes_table = self.__create_table(string_st, points_st, votes_st)

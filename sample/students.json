@@ -19,8 +19,13 @@
     "mod": "allow_notes"
   },
   {
+    "name": "Bigger Font",
+    "surname": "Surname 5",
+    "mod": "bigger_font"
+  },
+  {
     "name": "All",
-    "surname": "Surname 4",
-    "mod": ["more_time", "optional_questions", "allow_notes"]
+    "surname": "Surname 6",
+    "mod": ["more_time", "optional_questions", "allow_notes", "bigger_font"]
   }
 ]

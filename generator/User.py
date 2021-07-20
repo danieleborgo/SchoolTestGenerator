@@ -34,6 +34,7 @@ class Student(User):
         - A surname
         - A type for describe students needs
     """
+
     def __init__(self, register_number, name, surname, modifiers):
         super().__init__(modifiers)
         self.__register_number = register_number
@@ -68,7 +69,7 @@ def translate_students(students_json):
     for i in range(len(students_json)):
         students.append(
             Student(
-                register_number=i+1,
+                register_number=i + 1,
                 name=students_json[i]['name'],
                 surname=students_json[i]['surname'],
                 modifiers=extract_mods(students_json[i])

@@ -17,8 +17,8 @@
     ],
     "votes": {
         "min": {
-            "vote": 2,
-            "up_to": 2
+            "vote": 3,
+            "up_to": 3
         },
         "max": {
             "vote": 10,

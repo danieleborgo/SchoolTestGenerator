@@ -14,18 +14,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
+import warnings
 from os import mkdir, path
 
 from pylatex import *
 from pylatex.utils import bold
+from distutils.spawn import find_executable
 
 import generator.sentences as sentences
 from generator.User import translate_students, translate_anonymous_user, Student
 from generator.enums import Modifier
+from generator.test.Question import NEW_LINE_LATEX
 from generator.test.Test import Test
 from generator.test.TestLogger import TestLogger
 from generator.test.test_support import VotesData, PointsData
+
+DEBUG_CLEAN_TEXT = True
 
 
 def generate_tests(test_json: dict, students_json: dict = None, anonymous_json: dict = None):
@@ -43,6 +47,10 @@ def generate_tests(test_json: dict, students_json: dict = None, anonymous_json: 
     test_logger = TestLogger(students_json is not None)
     test = Test(test_json, test_logger)
 
+    latex_installed = is_latex_installed()
+    if not latex_installed:
+        warnings.warn("LaTex not installed: generating .tex files")
+
     if students_json is not None:
         students = translate_students(students_json)
         generate_test_with_configuration(
@@ -50,7 +58,8 @@ def generate_tests(test_json: dict, students_json: dict = None, anonymous_json: 
             test=test,
             students=students,
             test_logger=test_logger,
-            output_folder=output_folder
+            output_folder=output_folder,
+            latex_installed=latex_installed
         )
     elif anonymous_json is not None:
         anonymous_users = translate_anonymous_user(anonymous_json)
@@ -59,7 +68,8 @@ def generate_tests(test_json: dict, students_json: dict = None, anonymous_json: 
             test=test,
             anonymous_users=anonymous_users,
             test_logger=test_logger,
-            output_folder=output_folder
+            output_folder=output_folder,
+            latex_installed=latex_installed
         )
     else:
         raise Exception("No users defined for the test")
@@ -73,8 +83,8 @@ def generate_tests(test_json: dict, students_json: dict = None, anonymous_json: 
 
 def generate_test_with_configuration(single_file_flag: bool, test: Test,
                                      test_logger: TestLogger, output_folder: str,
-                                     students: tuple = None, anonymous_users: tuple = None):
-
+                                     students: tuple = None, anonymous_users: tuple = None,
+                                     latex_installed: bool = True):
     if bool(students is None) == bool(anonymous_users is None):
         raise Exception("Parameters malformed: define only one between students and anonymous users")
 
@@ -96,12 +106,13 @@ def generate_test_with_configuration(single_file_flag: bool, test: Test,
         generate_test_single_user(doc, is_students_mode, user, test, test_logger)
 
         if single_file_flag:
-            doc.generate_pdf(
+            generate_latex(
+                doc,
                 output_folder + (
                     (user.surname + '_' + user.name).replace(' ', '_') if is_students_mode
                     else str(i + 1)
                 ),
-                clean_tex=True
+                latex_installed
             )
 
         n_tests_generated += + 1
@@ -110,14 +121,23 @@ def generate_test_with_configuration(single_file_flag: bool, test: Test,
     print()
 
     if not single_file_flag:
-        doc.generate_pdf(
+        generate_latex(
+            doc,
             output_folder + (test.subtitle + "_" + test.test_class).replace(' ', '') +
             ("_s" if is_students_mode else "_a"),
-            clean_tex=True
+            latex_installed
         )
+
         print(f"Generated the PDF file with {len(users)} tests.")
     else:
         print(f"Generated {len(users)} tests")
+
+
+def generate_latex(doc: Document, output_path: str, latex_installed: bool):
+    if latex_installed:
+        doc.generate_pdf(output_path, clean_tex=DEBUG_CLEAN_TEXT)
+    else:
+        doc.generate_tex(output_path)
 
 
 def generate_doc_file(language: str) -> Document:
@@ -210,7 +230,8 @@ def generate_test_single_user(doc: Document, is_for_a_student: bool, student: St
     used_randoms, orders = print_questions_returning_randoms_and_orders(
         doc=doc,
         arguments=test.arguments,
-        has_optional_questions=student.do_you_need(Modifier.OPTIONAL_QUESTIONS)
+        has_optional_questions=student.do_you_need(Modifier.OPTIONAL_QUESTIONS),
+        has_bigger_font=student.do_you_need(Modifier.BIGGER_FONT)
     )
 
     if is_for_a_student:
@@ -238,7 +259,7 @@ def print_logo(doc: Document, logo_path: str):
     if logo_path is None:
         return
     with doc.create(Figure(position='h!')) as logo_figure:
-        logo_figure.add_image(logo_path, width=NoEscape(r'0.3\textwidth'))
+        logo_figure.add_image(logo_path, width=NoEscape(r'0.4\textwidth'))
 
 
 def print_student_name(doc: Document, name: str = None, surname: str = None):
@@ -303,22 +324,28 @@ def print_earned_points_table(doc: Document, points_data: PointsData):
     with doc.create(LongTable('l l', row_height=2.5, col_space='0.5cm')) as eval_table:
         eval_table.add_row(
             [sentences.EVALUATION.GAINED_POINTS +
-             ' (' + str(points_data.total_points) + '): ', '_'*10]
+             ' (' + str(points_data.total_points) + '): ', '_' * 10]
         )
-        eval_table.add_row([sentences.EVALUATION.GRADE + ': ', '_'*10])
+        eval_table.add_row([sentences.EVALUATION.GRADE + ': ', '_' * 10])
 
 
 def print_questions_returning_randoms_and_orders(doc: Document, arguments: tuple,
-                                                 has_optional_questions: bool):
+                                                 has_optional_questions: bool,
+                                                 has_bigger_font: bool):
     first = True
     used_randoms = []
-    doc.append(sentences.EVALUATION.BEFORE_EX_NOTE)
+    if has_bigger_font:
+        out = LargeText()
+        doc.append(out)
+    else:
+        out = doc
+    out.append(sentences.EVALUATION.BEFORE_EX_NOTE)
 
     orders = []
     for argument in arguments:
-        doc.append(Command('section*', argument.name))
+        out.append(Command('section*', argument.name))
         if argument.do_you_have_arg_text():
-            doc.append(NoEscape(argument.argument_text))
+            out.append(NoEscape(argument.argument_text))
 
         order = argument.get_question_order()
         for question_index in order:
@@ -328,7 +355,7 @@ def print_questions_returning_randoms_and_orders(doc: Document, arguments: tuple
             else:
                 options = 'resume'
 
-            with doc.create(Enumerate(options=options)) as enum:
+            with out.create(Enumerate(options=options)) as enum:
                 to_print, random = argument \
                     .get_question(question_index) \
                     .print_question_ret_randoms(has_optional_questions)
@@ -350,6 +377,10 @@ def new_page(doc: Document):
     doc.append(NewPage())
 
 
+def new_line(doc: Document):
+    doc.append(NoEscape(NEW_LINE_LATEX))
+
+
 def get_and_prepare_output_path(json_test: dict):
     if 'out_folder' in json_test:
         output_path = json_test['out_folder'] + '/'
@@ -361,3 +392,7 @@ def get_and_prepare_output_path(json_test: dict):
 
 def is_single_file(test_json: dict):
     return test_json['single_files'] if 'single_files' in test_json else False
+
+
+def is_latex_installed():
+    return find_executable('latex') is not None

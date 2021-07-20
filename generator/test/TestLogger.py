@@ -23,6 +23,7 @@ class TestLogger:
     """
         This class is used to store all the data needed for generating a logger file.
     """
+
     def __init__(self, is_student_mode):
         self.__data = {
             'mode': 'students' if is_student_mode else 'anonymous',

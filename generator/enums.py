@@ -33,6 +33,9 @@ class Modifier(Enum):
     # This is the modifier for who needs optional questions
     OPTIONAL_QUESTIONS = 3
 
+    # This is the modifier for increasing font size
+    BIGGER_FONT = 4
+
     @staticmethod
     def translate(string):
         """
@@ -49,7 +52,10 @@ class Modifier(Enum):
         if 'optional_questions'.__eq__(string):
             return Modifier.OPTIONAL_QUESTIONS
 
-        raise Exception("Type "+string+" unknown.")
+        if 'bigger_font'.__eq__(string):
+            return Modifier.BIGGER_FONT
+
+        raise Exception("Type " + string + " unknown.")
 
 
 class QuestionType(Enum):
@@ -61,6 +67,7 @@ class QuestionType(Enum):
     # This type describes a question represented by only a question, without adding extra space
     NO_SPACED_QUESTION = 0
 
+    # This type defines a question with a space for the answer
     SPACED_QUESTION = 1
 
     @staticmethod

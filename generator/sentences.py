@@ -26,7 +26,7 @@ OTHERS = None
 
 def import_sentences(language):
     """
-    This function import from the file properties the sentences.
+    This function imports from the properties file the sentences.
 
     :param language: the language of the test to create
     :return:
